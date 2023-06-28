@@ -5,8 +5,9 @@ const DOWNARROW = 40;
 const SPACEBAR = 32;
 
 class Game {
-    constructor(canvas, timescale, keyboardControlled) {
+    constructor(canvas, scoreElement, timescale, keyboardControlled) {
         this.drawer = new Drawer(canvas.getContext("2d"));
+        this.scoreElement = scoreElement;
         this.score = 0;
         this.board = [];
         this.rows = canvas.clientHeight / SQ;
@@ -30,6 +31,10 @@ class Game {
                 this.board[r][c] = VACANT;
             }
         }
+        for(let c = 0; c < this.cols - 1; c++) {
+            this.board[19][c] = "YELLOW"
+        }
+        
     }
 
 
@@ -54,25 +59,26 @@ class Game {
         } else if (event.keyCode == DOWNARROW) {
             this.movePiece();
         } else if (event.keyCode == SPACEBAR) {
-            this.p.drop();
-            this.newPiece();
+            let newScore = this.p.drop();
+            this.newPiece(newScore);
         }
     }
 
     movePiece() {
         let newScore = this.p.moveDown();
         if (newScore !== false) {
-            this.newPiece();
-            // this.score += newScore;
+            this.newPiece(newScore);
         }
     }
 
-    newPiece() {
+    newPiece(newScore) {
         this.drawBoard();
         this.p = Piece.random(this.board, this.drawer);
+        this.score += newScore;
     }
 
     update() {
+        console.log(this.score);
         if (this.gameOver) {
             return;
         }
@@ -82,5 +88,6 @@ class Game {
             this.movePiece();
             this.lastDrop = Date.now();
         }
+        this.scoreElement.innerHTML = this.score.toString();
     }
 }
