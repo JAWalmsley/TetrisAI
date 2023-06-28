@@ -108,7 +108,7 @@ Piece.prototype.rotate = function () {
     let kick = 0;
 
     if (this.collision(0, 0, nextPattern)) {
-        if (this.x > COL / 2) {
+        if (this.x > this.board[0].length / 2) {
             // it's the right wall
             kick = -1; // we need to move the piece to the left
         } else {
@@ -145,28 +145,27 @@ Piece.prototype.lock = function () {
         }
     }
     // remove full rows
-    for (r = 0; r < ROW; r++) {
+    for (r = 0; r < this.board.length; r++) {
         let isRowFull = true;
-        for (c = 0; c < COL; c++) {
+        for (c = 0; c < this.board[0].length; c++) {
             isRowFull = isRowFull && (this.board[r][c] != VACANT);
         }
         if (isRowFull) {
             // if the row is full
             // we move down all the rows above it
             for (y = r; y > 1; y--) {
-                for (c = 0; c < COL; c++) {
+                for (c = 0; c < this.board[0].length; c++) {
                     this.board[y][c] = this.board[y - 1][c];
                 }
             }
             // the top row this.board[0][..] has no row above it
-            for (c = 0; c < COL; c++) {
+            for (c = 0; c < this.board[0].length; c++) {
                 this.board[0][c] = VACANT;
             }
             // increment the score
             score += 10;
         }
     }
-    // draw board herre
 
     // update the score
     scoreElement.innerHTML = score;
@@ -175,8 +174,8 @@ Piece.prototype.lock = function () {
 // collision fucntion
 
 Piece.prototype.collision = function (x, y, piece) {
-    for (r = 0; r < piece.length; r++) {
-        for (c = 0; c < piece.length; c++) {
+    for (let r = 0; r < piece.length; r++) {
+        for (let c = 0; c < piece.length; c++) {
             // if the square is empty, we skip it
             if (!piece[r][c]) {
                 continue;
@@ -186,7 +185,7 @@ Piece.prototype.collision = function (x, y, piece) {
             let newY = this.y + r + y;
 
             // conditions
-            if (newX < 0 || newX >= COL || newY >= ROW) {
+            if (newX < 0 || newX >= this.board[0].length || newY >= this.board.length) {
                 return true;
             }
             // skip newY < 0; this.board[-1] will crush our game

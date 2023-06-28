@@ -5,13 +5,15 @@ const DOWNARROW = 40;
 const SPACEBAR = 32;
 
 class Game {
-    constructor(drawer, timescale, keyboardControlled) {
+    constructor(canvas, timescale, keyboardControlled) {
+        this.drawer = new Drawer(canvas.getContext("2d"));
         this.board = [];
-        this.drawer = drawer;
+        this.rows = canvas.clientHeight / SQ;
+        this.cols = canvas.clientWidth / SQ;
         this.gameOver = false;
         this.lastDrop = Date.now();
-        if(keyboardControlled){
-            document.addEventListener("keydown",this.handleKeyEvent.bind(this));
+        if (keyboardControlled) {
+            document.addEventListener("keydown", this.handleKeyEvent.bind(this));
         }
 
         this.setupBoard();
@@ -21,9 +23,9 @@ class Game {
     }
 
     setupBoard() {
-        for (let r = 0; r < ROW; r++) {
+        for (let r = 0; r < this.rows; r++) {
             this.board[r] = [];
-            for (let c = 0; c < COL; c++) {
+            for (let c = 0; c < this.cols; c++) {
                 this.board[r][c] = VACANT;
             }
         }
@@ -31,41 +33,50 @@ class Game {
 
 
     drawBoard() {
-        for (let r = 0; r < ROW; r++) {
-            for (let c = 0; c < COL; c++) {
+        for (let r = 0; r < this.rows; r++) {
+            for (let c = 0; c < this.cols; c++) {
                 this.drawer.drawSquare(c, r, this.board[r][c]);
             }
         }
     }
 
     handleKeyEvent(event) {
-        if(event.keyCode == LEFTARROW){
+        if (event.keyCode == LEFTARROW) {
             this.p.moveLeft();
             this.dropStart = Date.now();
-        }else if(event.keyCode == UPARROW){
+        } else if (event.keyCode == UPARROW) {
             this.p.rotate();
             this.dropStart = Date.now();
-        }else if(event.keyCode == RIGHTARROW){
+        } else if (event.keyCode == RIGHTARROW) {
             this.p.moveRight();
             this.dropStart = Date.now();
-        }else if(event.keyCode == DOWNARROW){
-            if(this.p.moveDown()){
-                this.p = Piece.random(this.board, this.drawer);
-            }
-        } else if(event.keyCode == SPACEBAR){
+        } else if (event.keyCode == DOWNARROW) {
+            this.movePiece();
+        } else if (event.keyCode == SPACEBAR) {
             this.p.drop();
-            this.p = Piece.random(this.board, this.drawer);
+            this.newPiece();
         }
     }
 
+    movePiece() {
+        if (this.p.moveDown()) {
+            this.newPiece();
+        }
+    }
+
+    newPiece() {
+        this.drawBoard();
+        this.p = Piece.random(this.board, this.drawer);
+    }
+
     update() {
-        if(this.gameOver) {
+        if (this.gameOver) {
             return;
         }
         let now = Date.now();
         let delta = now - this.lastDrop;
-        if (delta > 1000/this.timescale) {
-            this.p.moveDown();
+        if (delta > 1000 / this.timescale) {
+            this.movePiece();
             this.lastDrop = Date.now();
         }
     }
