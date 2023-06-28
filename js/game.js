@@ -7,6 +7,7 @@ const SPACEBAR = 32;
 class Game {
     constructor(canvas, timescale, keyboardControlled) {
         this.drawer = new Drawer(canvas.getContext("2d"));
+        this.score = 0;
         this.board = [];
         this.rows = canvas.clientHeight / SQ;
         this.cols = canvas.clientWidth / SQ;
@@ -59,8 +60,10 @@ class Game {
     }
 
     movePiece() {
-        if (this.p.moveDown()) {
+        let newScore = this.p.moveDown();
+        if (newScore !== false) {
             this.newPiece();
+            // this.score += newScore;
         }
     }
 

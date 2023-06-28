@@ -5,8 +5,6 @@ const VACANT = "WHITE"; // color of an empty square
 
 const FRAMETIME = 1000;
 
-let score = 0;
-
 let currGame = new Game(document.getElementById("game"), 5, true);
 
 // let game2 = new Game(document.getElementById("game2"), 5, false);
@@ -15,6 +13,7 @@ function updateGames(){
     currGame.update();
     // game2.update();
     requestAnimationFrame(updateGames);
+    // scoreElement.innerHTML = currGame.score;
 }
 
 updateGames();

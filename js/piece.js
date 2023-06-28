@@ -58,7 +58,7 @@ Piece.prototype.unDraw = function () {
 // Drop piece to bottom
 Piece.prototype.drop = function () {
     let atBottom = false;
-    while (!atBottom) {
+    while (atBottom === false) {
         atBottom = this.moveDown();
     }
     return true;
@@ -77,9 +77,7 @@ Piece.prototype.moveDown = function () {
         this.draw();
         return false;
     } else {
-        // we lock the piece and generate a new one
-        this.lock();
-        return true;
+        return this.lock();
     }
 
 }
@@ -127,6 +125,7 @@ Piece.prototype.rotate = function () {
 }
 
 Piece.prototype.lock = function () {
+    // let addedScore = 0;
     for (r = 0; r < this.activeTetromino.length; r++) {
         for (c = 0; c < this.activeTetromino.length; c++) {
             // we skip the vacant squares
@@ -163,12 +162,10 @@ Piece.prototype.lock = function () {
                 this.board[0][c] = VACANT;
             }
             // increment the score
-            score += 10;
+            // addedScore += 10;
         }
     }
-
-    // update the score
-    scoreElement.innerHTML = score;
+    // return addedScore;
 }
 
 // collision fucntion
