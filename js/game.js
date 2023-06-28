@@ -31,9 +31,9 @@ class Game {
                 this.board[r][c] = VACANT;
             }
         }
-        for(let c = 0; c < this.cols - 1; c++) {
-            this.board[19][c] = "YELLOW"
-        }
+        // for(let c = 0; c < this.cols - 1; c++) {
+        //     this.board[19][c] = "YELLOW"
+        // }
         
     }
 
