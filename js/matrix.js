@@ -1,0 +1,99 @@
+class Matrix {
+    constructor(rows, cols) {
+        this.rows = rows;
+        this.cols = cols;
+        this.data = Array(this.rows).fill().map(() => Array(this.cols).fill(0));
+    }
+
+    /**
+     * Create a 1D matrix from an array
+     * @param {Array} arr 
+     * @returns 
+     */
+    static fromArray(arr) {
+        return new Matrix(arr.length, 1).map((e, i) => arr[i]);
+    }
+
+    /**
+     * Add two matrices together
+     * @param {Matrix} a 
+     * @param {Matrix} b 
+     * @returns {Matrix}
+     */
+    static add(a, b) {
+        if (a.rows !== b.rows || a.cols !== b.cols) {
+            console.error("Addition: Matrix dimensions don't match");
+            return undefined;
+        }
+        return new Matrix(a.rows, a.cols).map((v, i, j) => a.data[i][j] + b.data[i][j]);
+    }
+
+    /**
+     * Multiply two matrices together
+     * @param {Matrix} a 
+     * @param {Matrix} b 
+     * @returns {Matrix}
+     */
+    static multiply(a, b) {
+        if(a.cols !== b.rows) {
+            console.error("Multiplication: Matrix dimensions don't match");
+            return undefined;
+        }
+        let output = new Matrix(a.rows, b.cols);
+        output.map((v, i, j) => {
+            let sum = 0;
+            for(let c = 0; c < a.cols; c++) {
+                sum += a.data[i][c] * b.data[c][j];
+            }
+            return sum;
+        });
+    }
+
+    /**
+     * Transpose a matrix (flip rows and columns)
+     * @returns {Matrix}
+     */
+    transpose() {
+        let ret = new Matrix(this.cols, this.rows);
+        ret.map((v, i, j) => this.data[j][i]);
+        return ret;
+    }
+
+    /**
+     * Copy a matrix
+     * @returns a new matrix with the same values as this one
+     */
+    copy() {
+        let ret = new Matrix(this.rows, this.cols);
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                ret.data[i][j] = this.data[i][j];
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Same as map from arrays, apply function to every element (even across dimensions)
+     * @param {function} callback 
+     * @returns a copy of this matrix with the function applied to every element
+     */
+    map(callback) {
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                let val = this.data[i][j];
+                this.data[i][j] = callback(val, i, j);
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Randomize the values of this matrix from min to max
+     * @param {Number} min 
+     * @param {Number} max 
+     */
+    randomize(min, max) {
+        return this.map(() => Math.random() * (min - max) + min);
+    }
+}
