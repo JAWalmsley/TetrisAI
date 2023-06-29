@@ -60,12 +60,12 @@ class Game {
             this.movePiece();
         } else if (event.keyCode == SPACEBAR) {
             this.p.drop();
-            this.newPiece(newScore);
+            this.newPiece();
         }
     }
 
     checkGameOver() {
-        console.log("checking game over")
+        // console.log("checking game over")
         for(let c = 0; c < this.cols; c++) {
             if(this.board[0][c] !== VACANT) {
                 this.gameOver = true;
@@ -101,7 +101,6 @@ class Game {
     movePiece() {
         
         let locked = this.p.moveDown();
-        console.log("moving piece, locked: ", locked)
         if (locked) {
             this.newPiece();
         }
@@ -115,7 +114,8 @@ class Game {
 
     update() {
         if (this.gameOver) {
-            this.scoreElement.innerHTML = "Game over, score: " + this.score.toString();
+            console.log("Game is over")
+            this.scoreElement.innerText = "Game over, score: " + this.score.toString();
             return;
         }
         let now = Date.now();
