@@ -93,7 +93,15 @@ class Matrix {
      * @param {Number} min 
      * @param {Number} max 
      */
-    randomize(min, max) {
-        return this.map(() => Math.random() * (min - max) + min);
+    randomize(min=-1, max=1) {
+        return this.map(() => Math.random() * (max - min) + min);
+    }
+
+    toString() {
+        let ret = "";
+        for(let i = 0; i < this.rows; i++) {
+            ret += this.data[i].join(" ") + "\n";
+        }
+        return ret;
     }
 }

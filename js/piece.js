@@ -19,8 +19,8 @@ function Piece(board, drawer, tetromino, color) {
     this.tetrominoN = 0; // we start from the first pattern
     this.activeTetromino = this.tetromino[this.tetrominoN];
 
-    // we need to control the pieces
-    this.x = 3;
+    // spawn in the middle of the board
+    this.x = Math.floor(this.board[0].length / 2) - 1;
     this.y = -2;
 }
 

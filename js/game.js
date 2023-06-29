@@ -6,6 +6,7 @@ const SPACEBAR = 32;
 
 class Game {
     constructor(canvas, scoreElement, timescale, keyboardControlled) {
+        this.canvas = canvas;
         this.drawer = new Drawer(canvas.getContext("2d"));
         this.scoreElement = scoreElement;
         this.score = 0;
@@ -31,9 +32,9 @@ class Game {
                 this.board[r][c] = VACANT;
             }
         }
-        for(let c = 0; c < this.cols - 1; c++) {
-            this.board[19][c] = "YELLOW"
-        }
+        // for(let c = 0; c < this.cols - 1; c++) {
+        //     this.board[19][c] = "YELLOW"
+        // }
         
     }
 
