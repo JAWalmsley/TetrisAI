@@ -31,9 +31,9 @@ class Game {
                 this.board[r][c] = VACANT;
             }
         }
-        // for(let c = 0; c < this.cols - 1; c++) {
-        //     this.board[19][c] = "YELLOW"
-        // }
+        for(let c = 0; c < this.cols - 1; c++) {
+            this.board[19][c] = "YELLOW"
+        }
         
     }
 
@@ -59,27 +59,63 @@ class Game {
         } else if (event.keyCode == DOWNARROW) {
             this.movePiece();
         } else if (event.keyCode == SPACEBAR) {
-            let newScore = this.p.drop();
+            this.p.drop();
             this.newPiece(newScore);
+        }
+    }
+
+    checkGameOver() {
+        console.log("checking game over")
+        for(let c = 0; c < this.cols; c++) {
+            if(this.board[0][c] !== VACANT) {
+                this.gameOver = true;
+                return;
+            }
+        }
+    }
+
+    checkCompleteRow() {
+        for (let r = 0; r < this.board.length; r++) {
+            let isRowFull = true;
+            for (let c = 0; c < this.board[0].length; c++) {
+                isRowFull = isRowFull && (this.board[r][c] != VACANT);
+            }
+            if (isRowFull) {
+                // if the row is full
+                // we move down all the rows above it
+                for (let y = r; y > 1; y--) {
+                    for (let c = 0; c < this.board[0].length; c++) {
+                        this.board[y][c] = this.board[y - 1][c];
+                    }
+                }
+                // the top row this.board[0][..] has no row above it
+                for (let c = 0; c < this.board[0].length; c++) {
+                    this.board[0][c] = VACANT;
+                }
+                // increment the score
+                this.score += 10;
+            }
         }
     }
 
     movePiece() {
-        let newScore = this.p.moveDown();
-        if (newScore !== false) {
-            this.newPiece(newScore);
+        
+        let locked = this.p.moveDown();
+        console.log("moving piece, locked: ", locked)
+        if (locked) {
+            this.newPiece();
         }
     }
 
-    newPiece(newScore) {
+    newPiece() {
+        this.checkCompleteRow();
         this.drawBoard();
         this.p = Piece.random(this.board, this.drawer);
-        this.score += newScore;
     }
 
     update() {
-        console.log(this.score);
         if (this.gameOver) {
+            this.scoreElement.innerHTML = "Game over, score: " + this.score.toString();
             return;
         }
         let now = Date.now();
@@ -88,6 +124,7 @@ class Game {
             this.movePiece();
             this.lastDrop = Date.now();
         }
+        this.checkGameOver();
         this.scoreElement.innerHTML = this.score.toString();
     }
 }

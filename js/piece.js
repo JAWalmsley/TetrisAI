@@ -61,7 +61,6 @@ Piece.prototype.drop = function () {
     while (atBottom === false) {
         atBottom = this.moveDown();
     }
-    return atBottom;
 }
 
 // move Down the piece
@@ -77,7 +76,8 @@ Piece.prototype.moveDown = function () {
         this.draw();
         return false;
     } else {
-        return this.lock();
+        this.lock();
+        return true;
     }
 
 }
@@ -125,7 +125,6 @@ Piece.prototype.rotate = function () {
 }
 
 Piece.prototype.lock = function () {
-    let addedScore = 0;
     for (r = 0; r < this.activeTetromino.length; r++) {
         for (c = 0; c < this.activeTetromino.length; c++) {
             // we skip the vacant squares
@@ -134,38 +133,12 @@ Piece.prototype.lock = function () {
             }
             // pieces to lock on top = game over
             if (this.y + r < 0) {
-                alert("Game Over");
-                // stop request animation frame
-                gameOver = true;
                 break;
             }
             // we lock the piece
             this.board[this.y + r][this.x + c] = this.color;
         }
     }
-    // remove full rows
-    for (r = 0; r < this.board.length; r++) {
-        let isRowFull = true;
-        for (c = 0; c < this.board[0].length; c++) {
-            isRowFull = isRowFull && (this.board[r][c] != VACANT);
-        }
-        if (isRowFull) {
-            // if the row is full
-            // we move down all the rows above it
-            for (y = r; y > 1; y--) {
-                for (c = 0; c < this.board[0].length; c++) {
-                    this.board[y][c] = this.board[y - 1][c];
-                }
-            }
-            // the top row this.board[0][..] has no row above it
-            for (c = 0; c < this.board[0].length; c++) {
-                this.board[0][c] = VACANT;
-            }
-            // increment the score
-            addedScore += 10;
-        }
-    }
-    return addedScore;
 }
 
 // collision fucntion
