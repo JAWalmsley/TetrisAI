@@ -12,15 +12,26 @@ function gaussianRandom(mean = 0, stdev = 0.5) {
 }
 
 class NeuralNetwork {
-    constructor(inputSize, hiddenSize, outputSize) {
-        // Weights from input to hidden
-        this.weightsIH = new Matrix(hiddenSize, inputSize).randomize();
-        // Weights from hidden to output
-        this.weightsHO = new Matrix(outputSize, hiddenSize).randomize();
-        // Bias for hidden layer
-        this.biasHidden = new Matrix(hiddenSize, 1).randomize();
-        // Bias for output layer
-        this.biasOutput = new Matrix(outputSize, 1).randomize();
+    constructor(a, b, c, d) {
+        if (typeof a == "number") {
+            let inputSize = a;
+            let hiddenSize = b;
+            let outputSize = c;
+            // Weights from input to hidden
+            this.weightsIH = new Matrix(hiddenSize, inputSize).randomize();
+            // Weights from hidden to output
+            this.weightsHO = new Matrix(outputSize, hiddenSize).randomize();
+            // Bias for hidden layer
+            this.biasHidden = new Matrix(hiddenSize, 1).randomize();
+            // Bias for output layer
+            this.biasOutput = new Matrix(outputSize, 1).randomize();
+        } else if(a instanceof Matrix) {
+            this.weightsIH = a;
+            this.weightsHO = b;
+            this.biasHidden = c;
+            this.biasOutput = d;
+        }
+
     }
 
     /**
@@ -46,9 +57,17 @@ class NeuralNetwork {
     }
 
     mutate(m, chance) {
-        if(Math.random(1) < chance) {
+        if (Math.random(1) < chance) {
             m.map((x) => x + gaussianRandom());
         }
+    }
+
+    copy() {
+        let wih = this.weightsIH.copy();
+        let who = this.weightsHO.copy();
+        let bh = this.biasHidden.copy();
+        let bo = this.biasOutput.copy();
+        return new NeuralNetwork(wih, who, bh, bo);
     }
 
     applyMutations() {

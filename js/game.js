@@ -4,8 +4,11 @@ const RIGHTARROW = 39;
 const DOWNARROW = 40;
 const SPACEBAR = 32;
 
+const ROWCOMPLETEBONUS = 200;
+
 class Game {
-    constructor(canvas, scoreElement, timescale, keyboardControlled) {
+    constructor(canvas, scoreElement, timescale, keyboardControlled, neuralNet) {
+        this.fitness = 0;
         this.canvas = canvas;
         this.drawer = new Drawer(canvas.getContext("2d"));
         this.scoreElement = scoreElement;
@@ -14,9 +17,15 @@ class Game {
         this.rows = canvas.clientHeight / SQ;
         this.cols = canvas.clientWidth / SQ;
         this.gameOver = false;
+        this.blocksPlaced = 0;
         this.lastDrop = Date.now();
+        
         if (keyboardControlled) {
             document.addEventListener("keydown", this.handleKeyEvent.bind(this));
+        } else if (neuralNet){
+            this.neuralNet = neuralNet;
+        } else {
+            this.neuralNet = new NeuralNetwork(200, 50, this.cols + 4);
         }
 
         this.setupBoard();
@@ -47,6 +56,19 @@ class Game {
         }
     }
 
+    canvasToMatrix() {
+        let ctx = this.canvas.getContext("2d");
+        let m = new Matrix(GAMEHEIGHT / SQ, GAMEWIDTH / SQ);
+        for (let y = SQ / 2; y < GAMEHEIGHT; y += SQ) {
+    
+            for (let x = SQ / 2; x < GAMEWIDTH; x += SQ) {
+                let rgb = ctx.getImageData(x, y, 1, 1).data;
+                m.data[Math.floor(y/SQ)][Math.floor(x/SQ)] = ((rgb[0] + rgb[1] + rgb[2]) < 765) ? 1 : 0
+            }
+        }
+        return m;
+    }
+
     handleKeyEvent(event) {
         if (event.keyCode == LEFTARROW) {
             this.p.moveLeft();
@@ -66,7 +88,6 @@ class Game {
     }
 
     checkGameOver() {
-        // console.log("checking game over")
         for(let c = 0; c < this.cols; c++) {
             if(this.board[0][c] !== VACANT) {
                 this.gameOver = true;
@@ -94,7 +115,7 @@ class Game {
                     this.board[0][c] = VACANT;
                 }
                 // increment the score
-                this.score += 10;
+                this.score += ROWCOMPLETEBONUS;
             }
         }
     }
@@ -108,24 +129,51 @@ class Game {
     }
 
     newPiece() {
+        this.blocksPlaced++;
         this.checkCompleteRow();
         this.drawBoard();
         this.p = Piece.random(this.board, this.drawer);
     }
 
+    makeAIMove() {
+        let output = this.neuralNet.getOutput(this.canvasToMatrix().toArray()).toArray();
+        let maxColumn = 0;;
+        for(let i = 0; i < this.cols; i++) {
+            if(output[i] > output[maxColumn]) {
+                maxColumn = i;
+            }
+        }
+        let maxRotation = 0;
+        for(let i = 0; i < 4; i++) {
+            if(output[i + this.cols] > output[maxRotation + this.cols]) {
+                maxRotation = i;
+            }
+        }
+        this.p.goToX(maxColumn - 1);
+        for(let i = 0; i < maxRotation; i++) {
+            this.handleKeyEvent({keyCode: UPARROW});
+        }
+        
+        // Drop the piece where we decided
+        this.handleKeyEvent({keyCode: SPACEBAR});
+    }
+
     update() {
         if (this.gameOver) {
-            console.log("Game is over")
             this.scoreElement.innerText = "Game over, score: " + this.score.toString();
             return;
         }
         let now = Date.now();
         let delta = now - this.lastDrop;
         if (delta > 1000 / this.timescale) {
+            if(this.neuralNet) {
+                this.makeAIMove();
+            }
             this.movePiece();
             this.lastDrop = Date.now();
         }
         this.checkGameOver();
-        this.scoreElement.innerHTML = this.score.toString();
+        this.fitness = this.score + this.blocksPlaced;
+        this.scoreElement.innerHTML = this.fitness.toString();
     }
 }

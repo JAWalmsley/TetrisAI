@@ -21,7 +21,7 @@ function Piece(board, drawer, tetromino, color) {
 
     // spawn in the middle of the board
     this.x = Math.floor(this.board[0].length / 2) - 1;
-    this.y = -2;
+    this.y = -1;
 }
 
 Piece.random = function (board, drawer) {
@@ -97,6 +97,24 @@ Piece.prototype.moveLeft = function () {
         this.unDraw();
         this.x--;
         this.draw();
+    }
+}
+
+Piece.prototype.goToX = function(x) {
+    let lastx = this.x;
+    while(this.x < x) {
+        lastx = this.x;
+        this.moveRight();
+        if(this.x == lastx) {
+            return;
+        }
+    }
+    while(this.x > x) {
+        lastx = this.x;
+        this.moveLeft();
+        if(this.x == lastx) {
+            return;
+        }
     }
 }
 

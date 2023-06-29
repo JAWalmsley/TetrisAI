@@ -20,12 +20,12 @@ class Matrix {
      * @param {Matrix} b 
      * @returns {Matrix}
      */
-    static add(a, b) {
-        if (a.rows !== b.rows || a.cols !== b.cols) {
+    add(b) {
+        if (this.rows !== b.rows || this.cols !== b.cols) {
             console.error("Addition: Matrix dimensions don't match");
             return undefined;
         }
-        return new Matrix(a.rows, a.cols).map((v, i, j) => a.data[i][j] + b.data[i][j]);
+        this.map((v, i, j) => this.data[i][j] + b.data[i][j]);
     }
 
     /**
@@ -47,6 +47,17 @@ class Matrix {
             }
             return sum;
         });
+        return output;
+    }
+
+    toArray() {
+        let arr = [];
+        for(let i = 0; i < this.rows; i++) {
+            for(let j = 0; j < this.cols; j++) {
+                arr.push(this.data[i][j]);
+            }
+        }
+        return arr;
     }
 
     /**
