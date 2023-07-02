@@ -70,8 +70,7 @@ class NeuralNetwork {
         return new NeuralNetwork(wih, who, bh, bo);
     }
 
-    applyMutations() {
-        let mutationChance = 0.1;
+    applyMutations(mutationChance) {
         this.mutate(this.weightsIH, mutationChance);
         this.mutate(this.weightsHO, mutationChance);
         this.mutate(this.biasHidden, mutationChance);

@@ -19,13 +19,13 @@ class Game {
         this.gameOver = false;
         this.blocksPlaced = 0;
         this.lastDrop = Date.now();
-        
+
         if (keyboardControlled) {
             document.addEventListener("keydown", this.handleKeyEvent.bind(this));
-        } else if (neuralNet){
+        } else if (neuralNet) {
             this.neuralNet = neuralNet;
         } else {
-            this.neuralNet = new NeuralNetwork(200, 50, this.cols + 4);
+            this.neuralNet = new NeuralNetwork(this.cols + 7, 10, this.cols + 4);
         }
 
         this.setupBoard();
@@ -44,7 +44,7 @@ class Game {
         // for(let c = 0; c < this.cols - 1; c++) {
         //     this.board[19][c] = "YELLOW"
         // }
-        
+
     }
 
 
@@ -60,10 +60,10 @@ class Game {
         let ctx = this.canvas.getContext("2d");
         let m = new Matrix(GAMEHEIGHT / SQ, GAMEWIDTH / SQ);
         for (let y = SQ / 2; y < GAMEHEIGHT; y += SQ) {
-    
+
             for (let x = SQ / 2; x < GAMEWIDTH; x += SQ) {
                 let rgb = ctx.getImageData(x, y, 1, 1).data;
-                m.data[Math.floor(y/SQ)][Math.floor(x/SQ)] = ((rgb[0] + rgb[1] + rgb[2]) < 765) ? 1 : 0
+                m.data[Math.floor(y / SQ)][Math.floor(x / SQ)] = ((rgb[0] + rgb[1] + rgb[2]) < 765) ? 1 : 0
             }
         }
         return m;
@@ -88,8 +88,8 @@ class Game {
     }
 
     checkGameOver() {
-        for(let c = 0; c < this.cols; c++) {
-            if(this.board[0][c] !== VACANT) {
+        for (let c = 0; c < this.cols; c++) {
+            if (this.board[0][c] !== VACANT) {
                 this.gameOver = true;
                 return;
             }
@@ -121,7 +121,7 @@ class Game {
     }
 
     movePiece() {
-        
+
         let locked = this.p.moveDown();
         if (locked) {
             this.newPiece();
@@ -135,27 +135,74 @@ class Game {
         this.p = Piece.random(this.board, this.drawer);
     }
 
+    getInputs() {
+        let ret = [];
+        // Height of every column as input
+        for (let x = 0; x < this.cols; x++) {
+            let height = 0;
+            // Go backwards through rows to find max height with item in it
+            for (let y = this.rows - 1; y > 0; y--) {
+                if (this.board[y][x] !== VACANT) {
+                    height = y;
+                }
+            }
+            // Normalized to [0, 1] because neural networks like that kinda stuff
+            ret.push(height/this.rows);
+        }
+
+        // Type of piece up next as input
+        // We give each possible tetromino its own input neuron because that is more optimal
+        // https://stats.stackexchange.com/questions/157985/neural-network-binary-vs-discrete-continuous-input
+        switch (this.p.tetromino) {
+            case Z:
+                ret.push(1, 0, 0, 0, 0, 0, 0);
+                break;
+            case S:
+                ret.push(0, 1, 0, 0, 0, 0, 0);
+                break;
+            case T:
+                ret.push(0, 0, 1, 0, 0, 0, 0);
+                break;
+            case O:
+                ret.push(0, 0, 0, 1, 0, 0, 0);
+                break;
+            case L:
+                ret.push(0, 0, 0, 0, 1, 0, 0);
+                break;
+            case I:
+                ret.push(0, 0, 0, 0, 0, 1, 0);
+                break;
+            case J:
+                ret.push(0, 0, 0, 0, 0, 0, 1);
+                break;
+            default:
+                console.error("aaaaa");
+                break;
+        }
+        return ret;
+    }
+
     makeAIMove() {
-        let output = this.neuralNet.getOutput(this.canvasToMatrix().toArray()).toArray();
+        let output = this.neuralNet.getOutput(this.getInputs()).toArray();
         let maxColumn = 0;;
-        for(let i = 0; i < this.cols; i++) {
-            if(output[i] > output[maxColumn]) {
+        for (let i = 0; i < this.cols; i++) {
+            if (output[i] > output[maxColumn]) {
                 maxColumn = i;
             }
         }
         let maxRotation = 0;
-        for(let i = 0; i < 4; i++) {
-            if(output[i + this.cols] > output[maxRotation + this.cols]) {
+        for (let i = 0; i < 4; i++) {
+            if (output[i + this.cols] > output[maxRotation + this.cols]) {
                 maxRotation = i;
             }
         }
         this.p.goToX(maxColumn - 1);
-        for(let i = 0; i < maxRotation; i++) {
-            this.handleKeyEvent({keyCode: UPARROW});
+        for (let i = 0; i < maxRotation; i++) {
+            this.handleKeyEvent({ keyCode: UPARROW });
         }
-        
+
         // Drop the piece where we decided
-        this.handleKeyEvent({keyCode: SPACEBAR});
+        this.handleKeyEvent({ keyCode: SPACEBAR });
     }
 
     update() {
@@ -166,7 +213,7 @@ class Game {
         let now = Date.now();
         let delta = now - this.lastDrop;
         if (delta > 1000 / this.timescale) {
-            if(this.neuralNet) {
+            if (this.neuralNet) {
                 this.makeAIMove();
             }
             this.movePiece();
