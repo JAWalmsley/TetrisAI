@@ -25,7 +25,7 @@ class Game {
         } else if (neuralNet) {
             this.neuralNet = neuralNet;
         } else {
-            this.neuralNet = new NeuralNetwork(this.cols + 7, 10, this.cols + 4);
+            this.neuralNet = new NeuralNetwork(this.cols + 7, this.cols+6, this.cols + 4);
         }
 
         this.setupBoard();

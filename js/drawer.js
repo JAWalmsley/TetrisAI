@@ -4,7 +4,7 @@ class Drawer {
     }
 
     static RainbowColor(length, maxLength) {
-        var i = (length * 255 / maxLength);
+        var i = Math.abs(length * 255 / maxLength);
         var r = length < 0 ? i : 0;
         var g = length >= 0 ? i : 0;
         var b = 0;
@@ -24,11 +24,12 @@ class Drawer {
         const CIRCLE_RADIUS = 5;
         const COLUMN_GAP = 100;
         const ROW_GAP = 20;
+
+        const MIN_WEIGHT_DRAW = 0.9;
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         let inputs = nn.weightsIH.cols;
         let hiddens = nn.weightsIH.rows;
         let outputs = nn.weightsHO.rows;
-
         for (let i = 0; i < inputs; i++) {
             this.ctx.beginPath();
             this.ctx.arc(START_OFFSET_X, ROW_GAP * i + START_OFFSET_Y, CIRCLE_RADIUS, 0, 2 * Math.PI);
@@ -49,7 +50,7 @@ class Drawer {
         }
 
         nn.weightsIH.map((x, r, c) => {
-            if (x < 0.5) { return; }
+            if (Math.abs(x) < MIN_WEIGHT_DRAW) { return; }
             this.ctx.beginPath();
             this.ctx.moveTo(START_OFFSET_X, ROW_GAP * c + START_OFFSET_Y);
             this.ctx.lineTo(START_OFFSET_X + COLUMN_GAP, ROW_GAP * r + START_OFFSET_Y);
@@ -57,10 +58,11 @@ class Drawer {
             this.ctx.strokeStyle = Drawer.RainbowColor(x, 1);
             this.ctx.stroke();
             this.ctx.lineWidth = 1;
+            this.ctx.strokeStyle = "black";
         })
 
         nn.weightsHO.map((x, r, c) => {
-            if (x < 0.5) { return; }
+            if (Math.abs(x) < MIN_WEIGHT_DRAW) { return; }
             this.ctx.beginPath();
             this.ctx.moveTo(START_OFFSET_X + COLUMN_GAP, ROW_GAP * c + START_OFFSET_Y);
             this.ctx.lineTo(START_OFFSET_X + COLUMN_GAP * 2, ROW_GAP * r + START_OFFSET_Y);
@@ -68,6 +70,7 @@ class Drawer {
             this.ctx.strokeStyle = Drawer.RainbowColor(x, 1);
             this.ctx.stroke();
             this.ctx.lineWidth = 1;
+            this.ctx.strokeStyle = "black";
         })
     }
 }
