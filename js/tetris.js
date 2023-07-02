@@ -9,13 +9,15 @@ let activeGames = [];
 let completedGames = [];
 
 
-const POPULATION = 10;
-const MUTATION_CHANCE = 0.1;
+const POPULATION = 500;
+const MUTATION_CHANCE = 0.01;
 
-let TIMESCALE = 10;
+let TIMESCALE = 1000;
 let DRAW = true;
 
 let canvList = [];
+
+let lastGenerationTime = Date.now();
 
 for (let i = 0; i < POPULATION; i++) {
     let d = document.createElement("span");
@@ -30,7 +32,7 @@ for (let i = 0; i < POPULATION; i++) {
     d.appendChild(scoreCounter);
     document.getElementById("gameDisplay").appendChild(d);
     canvList.push(d);
-    activeGames.push(new Game(canv, scoreCounter, TIMESCALE, false, true));
+    activeGames.push(new Game(canv, scoreCounter, TIMESCALE, false, false));
 }
 // Wild DOM hack to turn a HTMLCollection into an array
 let canvasses = Array.prototype.slice.call(canvList);
@@ -38,59 +40,25 @@ let canvasses = Array.prototype.slice.call(canvList);
 let cv = document.getElementById("neuralDisplay");
 let draw = new Drawer(cv.getContext("2d"));
 
-
-function weighted_random(options) {
-    var i;
-
-    var weights = [options[0].fitness];
-
-    for (i = 1; i < options.length; i++)
-        weights[i] = options[i].fitness + weights[i - 1];
-
-    var random = Math.random() * weights[weights.length - 1];
-
-    for (i = 0; i < weights.length; i++)
-        if (weights[i] > random)
-            break;
-
-    return options[i];
-}
-
 function nextGeneration() {
+    
     let outputPop = [];
 
     // completedGames.sort((a, b) => (a.fitness > b.fitness) ? -1 : ((b.fitness > a.fitness) ? 1 : 0));
     // console.log(completedGames.map(g => g.fitness));
     draw.drawNN(completedGames[0].game.neuralNet);
     let tempCanvasses = canvasses.slice().reverse();;
-    // for (let j = 0; j < POPULATION / 2; j++) {
-    //     for (let i = 0; i < 2; i++) {
-    //         let newBrain = completedGames[j].game.neuralNet.copy();
-    //         let c = tempCanvasses.pop();
-    //         // let c = canvasses[0];
-    //         let g;
-    //         // Draw the best from last generation, mutate every other one
-    //         if (j == 0 && i == 0 && DRAW) {
-    //             g = new Game(c.getElementsByTagName("canvas")[0], c.getElementsByTagName("div")[0], TIMESCALE, false, newBrain, true)
-    //         } else {
-    //             newBrain.applyMutations(MUTATION_CHANCE);
-    //             g = new Game(c.getElementsByTagName("canvas")[0], c.getElementsByTagName("div")[0], TIMESCALE, false, newBrain)
-    //         }
-    //         outputPop.push(g);
-    //     }
-    // }
 
     while (outputPop.length < POPULATION) {
         let newBrain = weighted_random(completedGames).game.neuralNet.copy();
         let c = tempCanvasses.pop();
-        // let c = canvasses[0];
         let g;
         // Draw the best from last generation, mutate every other one
         if (outputPop.length == 0 && DRAW) {
             g = new Game(c.getElementsByTagName("canvas")[0], c.getElementsByTagName("div")[0], TIMESCALE, false, true, newBrain)
         } else {
             newBrain.applyMutations(MUTATION_CHANCE);
-            g = new Game(c.getElementsByTagName("canvas")[0], c.getElementsByTagName("div")[0], TIMESCALE, false, true, newBrain)
+            g = new Game(c.getElementsByTagName("canvas")[0], c.getElementsByTagName("div")[0], TIMESCALE, false, false, newBrain)
         }
         outputPop.push(g);
     }
@@ -117,13 +85,19 @@ function updateGames() {
     }
     if (activeGames.length == 0) {
         // console.log("all games finished", completedGames);
-        console.log("Max fitness: " + Math.max(...completedGames.map(g => g.fitness)), "Avg fitness: " + avg(completedGames));
+        let deltaTime = Date.now() - lastGenerationTime;
+        lastGenerationTime = Date.now();
+        console.log("Max fitness: " + Math.max(...completedGames.map(g => g.fitness)), "Avg fitness: " + avg(completedGames), "Generation time: " + deltaTime);
         activeGames = nextGeneration();
         completedGames = [];
         console.log("restarting...")
     }
-    requestAnimationFrame(updateGames);
+    // requestAnimationFrame(updateGames);
 
 }
 
-updateGames();
+
+setInterval(updateGames, 0.1)
+// while(true){
+//     updateGames();
+// }

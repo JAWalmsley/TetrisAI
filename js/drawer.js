@@ -1,6 +1,8 @@
 class Drawer {
     constructor(ctx) {
         this.ctx = ctx
+        this.ctx.font = "11px sans-serif";
+        this.ctx.textBaseline = "middle";
     }
 
     static RainbowColor(length, maxLength) {
@@ -19,7 +21,7 @@ class Drawer {
     }
 
     drawNN(nn) {
-        const START_OFFSET_X = 50;
+        const START_OFFSET_X = 100;
         const START_OFFSET_Y = 50;
         const CIRCLE_RADIUS = 5;
         const COLUMN_GAP = 100;
@@ -30,10 +32,19 @@ class Drawer {
         let inputs = nn.weightsIH.cols;
         let hiddens = nn.weightsIH.rows;
         let outputs = nn.weightsHO.rows;
+
+        let inLabels = nn.inputLabels;
+        let outLabels = nn.outputLabels;
         for (let i = 0; i < inputs; i++) {
             this.ctx.beginPath();
             this.ctx.arc(START_OFFSET_X, ROW_GAP * i + START_OFFSET_Y, CIRCLE_RADIUS, 0, 2 * Math.PI);
             this.ctx.stroke();
+            if(inLabels)
+            {
+                this.ctx.textAlign = "right";
+                this.ctx.fillText(inLabels[i], START_OFFSET_X - 10, ROW_GAP * i + START_OFFSET_Y);
+            }
+   
         }
 
         for (let i = 0; i < hiddens; i++) {
@@ -50,6 +61,12 @@ class Drawer {
             this.ctx.fillStyle = Drawer.RainbowColor(nn.biasOutput.data[i][0], 1);
             this.ctx.fill();
             this.ctx.fillStyle = "black";
+            if(outLabels)
+            {
+                this.ctx.textAlign = "left";
+                this.ctx.fillText(outLabels[i], START_OFFSET_X + COLUMN_GAP * 2 + 10, ROW_GAP * i + START_OFFSET_Y);
+            }
+
         }
 
         nn.weightsIH.foreach((x, r, c) => {

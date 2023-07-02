@@ -1,7 +1,7 @@
 
 
 class NeuralNetwork {
-    constructor(a, b, c, d) {
+    constructor(a, b, c, d, e = [], f = []) {
         if (typeof a == "number") {
             let inputSize = a;
             let hiddenSize = b;
@@ -14,12 +14,14 @@ class NeuralNetwork {
             this.biasHidden = new Matrix(hiddenSize, 1).randomize();
             // Bias for output layer
             this.biasOutput = new Matrix(outputSize, 1).randomize();
-        } else if(a instanceof Matrix) {
+        } else if (a instanceof Matrix) {
             this.weightsIH = a;
             this.weightsHO = b;
             this.biasHidden = c;
             this.biasOutput = d;
         }
+        this.inputLabels = e;
+        this.outputLabels = f;
 
     }
 
@@ -56,7 +58,9 @@ class NeuralNetwork {
         let who = this.weightsHO.copy();
         let bh = this.biasHidden.copy();
         let bo = this.biasOutput.copy();
-        return new NeuralNetwork(wih, who, bh, bo);
+        let il = this.inputLabels.slice();
+        let ol = this.outputLabels.slice();
+        return new NeuralNetwork(wih, who, bh, bo, il, ol);
     }
 
     applyMutations(mutationChance) {

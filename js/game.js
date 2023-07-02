@@ -27,7 +27,13 @@ class Game {
         } else if (neuralNet) {
             this.neuralNet = neuralNet;
         } else {
-            this.neuralNet = new NeuralNetwork(this.cols + 10, this.cols + 7, this.cols + 4);
+            let inlbl = [];
+            for(let i = 0; i < this.cols; i++) {
+                inlbl.push("C" + i.toString() + " height");
+            }
+            inlbl.push("Z", "S", "T", "O", "L", "I", "J");
+            inlbl.push("Piece Y", "Piece X", "Piece Rotation");
+            this.neuralNet = new NeuralNetwork(this.cols + 10, this.cols + 7, 3, null, inlbl, ["left", "right", "rotate"]);
         }
 
         this.setupBoard();
@@ -193,30 +199,39 @@ class Game {
 
     makeAIMove() {
         let output = this.neuralNet.getOutput(this.getInputs()).toArray();
-        let maxColumn = 0;
-        for (let i = 0; i < this.cols; i++) {
-            if (output[i] > output[maxColumn]) {
-                maxColumn = i;
+        let maxOutput = 0;
+        for (let i = 0; i < output.length; i++) {
+            if (output[i] > output[maxOutput]) {
+                maxOutput = i;
             }
         }
-        let maxRotation = 0;
-        for (let i = 0; i < 4; i++) {
-            if (output[i + this.cols] > output[maxRotation + this.cols]) {
-                maxRotation = i;
-            }
+        switch(maxOutput) {
+            case 0:
+                this.handleKeyEvent({ keyCode: LEFTARROW });
+                break;
+            case 1:
+                this.handleKeyEvent({keyCode: RIGHTARROW});
+                break;
+            case 2:
+                this.handleKeyEvent({keyCode: UPARROW});
+                break;
         }
-        this.p.goToX(maxColumn - 1);
-        for (let i = 0; i < maxRotation; i++) {
-            // this.p.rotate();
-            this.handleKeyEvent({ keyCode: UPARROW });
-        }
+        // let maxRotation = 0;
+        // for (let i = 0; i < 4; i++) {
+        //     if (output[i + this.cols] > output[maxRotation + this.cols]) {
+        //         maxRotation = i;
+        //     }
+        // }
+        // this.p.goToX(maxColumn - 1);
+        // for (let i = 0; i < maxRotation; i++) {
+        //     // this.p.rotate();
+        //     this.handleKeyEvent({ keyCode: UPARROW });
+        // }
 
-        // Drop the piece where we decided
-        // this.handleKeyEvent({ keyCode: SPACEBAR });
     }
 
     getFitness() {
-        let ret = 0;
+        let ret = 100;
         ret += this.score;
         ret += this.blocksPlaced * 0.5;
         for (let i = 0; i < this.cols; i++) {
@@ -224,8 +239,8 @@ class Game {
             for (let j = 0; j < this.rows; j++) {
                 if (block && this.board[j][i] === VACANT) {
                     // We have seen a block and then a vacant square, there is a hole
-                    ret -= 0.5;
-                    break;
+                    ret -= 1;
+                    // break;
                 }
                 if (this.board[j][i] !== VACANT) {
                     block = true;
@@ -237,7 +252,7 @@ class Game {
     }
 
     update() {
-        // this.drawBoard();
+        this.drawBoard();
         if (this.gameOver) {
             if (this.drawer) {
                 this.scoreElement.innerText = "Game over, score: " + this.score.toString();
@@ -246,7 +261,7 @@ class Game {
         }
         let now = Date.now();
         let delta = now - this.lastDrop;
-        if (delta > 1000 / this.timescale) {
+        if (delta > (1000 / this.timescale)) {
             if (this.neuralNet) {
                 this.makeAIMove();
             }

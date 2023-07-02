@@ -10,3 +10,20 @@ function gaussianRandom(mean = 0, stdev = 0.5) {
     // Transform to the desired mean and standard deviation:
     return z * stdev + mean;
 }
+
+function weighted_random(options) {
+    var i;
+
+    var weights = [options[0].fitness];
+
+    for (i = 1; i < options.length; i++)
+        weights[i] = options[i].fitness + weights[i - 1];
+
+    var random = Math.random() * weights[weights.length - 1];
+
+    for (i = 0; i < weights.length; i++)
+        if (weights[i] > random)
+            break;
+
+    return options[i];
+}
