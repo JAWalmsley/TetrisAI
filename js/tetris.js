@@ -9,10 +9,10 @@ let activeGames = [];
 let completedGames = [];
 
 
-const POPULATION = 1000;
-const MUTATION_CHANCE = 0.01;
+const POPULATION = 10;
+const MUTATION_CHANCE = 0.1;
 
-let TIMESCALE = 100;
+let TIMESCALE = 10;
 let DRAW = true;
 
 let canvList = [];
@@ -30,7 +30,7 @@ for (let i = 0; i < POPULATION; i++) {
     d.appendChild(scoreCounter);
     document.getElementById("gameDisplay").appendChild(d);
     canvList.push(d);
-    activeGames.push(new Game(canv, scoreCounter, TIMESCALE, false));
+    activeGames.push(new Game(canv, scoreCounter, TIMESCALE, false, true));
 }
 // Wild DOM hack to turn a HTMLCollection into an array
 let canvasses = Array.prototype.slice.call(canvList);
@@ -87,10 +87,10 @@ function nextGeneration() {
         let g;
         // Draw the best from last generation, mutate every other one
         if (outputPop.length == 0 && DRAW) {
-            g = new Game(c.getElementsByTagName("canvas")[0], c.getElementsByTagName("div")[0], TIMESCALE, false, newBrain, true)
+            g = new Game(c.getElementsByTagName("canvas")[0], c.getElementsByTagName("div")[0], TIMESCALE, false, true, newBrain)
         } else {
             newBrain.applyMutations(MUTATION_CHANCE);
-            g = new Game(c.getElementsByTagName("canvas")[0], c.getElementsByTagName("div")[0], TIMESCALE, false, newBrain)
+            g = new Game(c.getElementsByTagName("canvas")[0], c.getElementsByTagName("div")[0], TIMESCALE, false, true, newBrain)
         }
         outputPop.push(g);
     }

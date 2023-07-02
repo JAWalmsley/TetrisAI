@@ -7,7 +7,7 @@ const SPACEBAR = 32;
 const ROWCOMPLETEBONUS = 200;
 
 class Game {
-    constructor(canvas, scoreElement, timescale, keyboardControlled, neuralNet, draw = false) {
+    constructor(canvas, scoreElement, timescale, keyboardControlled, draw, neuralNet) {
         this.fitness = 0;
         this.canvas = canvas;
         if (draw) {
@@ -27,7 +27,7 @@ class Game {
         } else if (neuralNet) {
             this.neuralNet = neuralNet;
         } else {
-            this.neuralNet = new NeuralNetwork(this.cols + 7, this.cols + 6, this.cols + 4);
+            this.neuralNet = new NeuralNetwork(this.cols + 10, this.cols + 7, this.cols + 4);
         }
 
         this.setupBoard();
@@ -183,6 +183,11 @@ class Game {
                 console.error("aaaaa");
                 break;
         }
+
+        // Add current piece's position and rotation
+        ret.push(this.p.y / this.rows);
+        ret.push(this.p.x / this.cols);
+        ret.push(this.p.tetrominoN / 3)
         return ret;
     }
 
@@ -202,12 +207,12 @@ class Game {
         }
         this.p.goToX(maxColumn - 1);
         for (let i = 0; i < maxRotation; i++) {
-            this.p.rotate();
-            // this.handleKeyEvent({ keyCode: UPARROW });
+            // this.p.rotate();
+            this.handleKeyEvent({ keyCode: UPARROW });
         }
 
         // Drop the piece where we decided
-        this.handleKeyEvent({ keyCode: SPACEBAR });
+        // this.handleKeyEvent({ keyCode: SPACEBAR });
     }
 
     getFitness() {
@@ -216,22 +221,23 @@ class Game {
         ret += this.blocksPlaced * 0.5;
         for (let i = 0; i < this.cols; i++) {
             let block = false;
-            for(let j = 0; j < this.rows; j++){
-                if(block && this.board[j][i] === VACANT) {
+            for (let j = 0; j < this.rows; j++) {
+                if (block && this.board[j][i] === VACANT) {
                     // We have seen a block and then a vacant square, there is a hole
                     ret -= 0.5;
                     break;
                 }
-                if(this.board[j][i] !== VACANT) {
+                if (this.board[j][i] !== VACANT) {
                     block = true;
                 }
             }
-        
+
         }
         return Math.max(ret, 0);
     }
 
     update() {
+        // this.drawBoard();
         if (this.gameOver) {
             if (this.drawer) {
                 this.scoreElement.innerText = "Game over, score: " + this.score.toString();
