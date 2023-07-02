@@ -36,7 +36,9 @@ Piece.prototype.fill = function (color) {
         for (c = 0; c < this.activeTetromino.length; c++) {
             // we draw only occupied squares
             if (this.activeTetromino[r][c]) {
-                this.drawer.drawSquare(this.x + c, this.y + r, color);
+                if (this.drawer) {
+                    this.drawer.drawSquare(this.x + c, this.y + r, color);
+                }
             }
         }
     }
@@ -100,19 +102,19 @@ Piece.prototype.moveLeft = function () {
     }
 }
 
-Piece.prototype.goToX = function(x) {
+Piece.prototype.goToX = function (x) {
     let lastx = this.x;
-    while(this.x < x) {
+    while (this.x < x) {
         lastx = this.x;
         this.moveRight();
-        if(this.x == lastx) {
+        if (this.x == lastx) {
             return;
         }
     }
-    while(this.x > x) {
+    while (this.x > x) {
         lastx = this.x;
         this.moveLeft();
-        if(this.x == lastx) {
+        if (this.x == lastx) {
             return;
         }
     }

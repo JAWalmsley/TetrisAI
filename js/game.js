@@ -7,11 +7,13 @@ const SPACEBAR = 32;
 const ROWCOMPLETEBONUS = 200;
 
 class Game {
-    constructor(canvas, scoreElement, timescale, keyboardControlled, neuralNet) {
+    constructor(canvas, scoreElement, timescale, keyboardControlled, neuralNet, draw = false) {
         this.fitness = 0;
         this.canvas = canvas;
-        this.drawer = new Drawer(canvas.getContext("2d"));
-        this.scoreElement = scoreElement;
+        if (draw) {
+            this.drawer = new Drawer(canvas.getContext("2d"));
+            this.scoreElement = scoreElement;
+        }
         this.score = 0;
         this.board = [];
         this.rows = canvas.clientHeight / SQ;
@@ -25,7 +27,7 @@ class Game {
         } else if (neuralNet) {
             this.neuralNet = neuralNet;
         } else {
-            this.neuralNet = new NeuralNetwork(this.cols + 7, this.cols+6, this.cols + 4);
+            this.neuralNet = new NeuralNetwork(this.cols + 7, this.cols + 6, this.cols + 4);
         }
 
         this.setupBoard();
@@ -51,7 +53,9 @@ class Game {
     drawBoard() {
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
-                this.drawer.drawSquare(c, r, this.board[r][c]);
+                if (this.drawer) {
+                    this.drawer.drawSquare(c, r, this.board[r][c]);
+                }
             }
         }
     }
@@ -105,7 +109,7 @@ class Game {
             if (isRowFull) {
                 // if the row is full
                 // we move down all the rows above it
-                for (let y = r; y > 1; y--) {
+                for (let y = r; y > 0; y--) {
                     for (let c = 0; c < this.board[0].length; c++) {
                         this.board[y][c] = this.board[y - 1][c];
                     }
@@ -147,7 +151,7 @@ class Game {
                 }
             }
             // Normalized to [0, 1] because neural networks like that kinda stuff
-            ret.push(height/this.rows);
+            ret.push(height / this.rows);
         }
 
         // Type of piece up next as input
@@ -207,7 +211,10 @@ class Game {
 
     update() {
         if (this.gameOver) {
-            this.scoreElement.innerText = "Game over, score: " + this.score.toString();
+            if (this.drawer) {
+                this.scoreElement.innerText = "Game over, score: " + this.score.toString();
+
+            }
             return;
         }
         let now = Date.now();
@@ -220,7 +227,9 @@ class Game {
             this.lastDrop = Date.now();
         }
         this.checkGameOver();
-        this.fitness = this.score + this.blocksPlaced;
-        this.scoreElement.innerHTML = this.fitness.toString();
+        this.fitness = this.score + this.blocksPlaced*0.5;
+        if (this.drawer) {
+            this.scoreElement.innerHTML = this.fitness.toString();
+        }
     }
 }

@@ -54,7 +54,7 @@ class Drawer {
             this.ctx.beginPath();
             this.ctx.moveTo(START_OFFSET_X, ROW_GAP * c + START_OFFSET_Y);
             this.ctx.lineTo(START_OFFSET_X + COLUMN_GAP, ROW_GAP * r + START_OFFSET_Y);
-            this.ctx.lineWidth = Math.abs(x);
+            // this.ctx.lineWidth = Math.abs(x);
             this.ctx.strokeStyle = Drawer.RainbowColor(x, 1);
             this.ctx.stroke();
             this.ctx.lineWidth = 1;
@@ -66,7 +66,7 @@ class Drawer {
             this.ctx.beginPath();
             this.ctx.moveTo(START_OFFSET_X + COLUMN_GAP, ROW_GAP * c + START_OFFSET_Y);
             this.ctx.lineTo(START_OFFSET_X + COLUMN_GAP * 2, ROW_GAP * r + START_OFFSET_Y);
-            this.ctx.lineWidth = Math.abs(x);
+            // this.ctx.lineWidth = Math.abs(x);
             this.ctx.strokeStyle = Drawer.RainbowColor(x, 1);
             this.ctx.stroke();
             this.ctx.lineWidth = 1;
