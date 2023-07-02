@@ -117,7 +117,9 @@ class Matrix {
      * @param {Number} max 
      */
     randomize(min=-1, max=1) {
-        return this.map(() => Math.random() * (max - min) + min);
+        let mean = (min+max)/2
+        let stddev = (max-mean)
+        return this.map(() => gaussianRandom(mean, stddev));
     }
 
     toString() {

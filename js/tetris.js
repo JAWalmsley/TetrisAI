@@ -4,15 +4,15 @@ const VACANT = "WHITE"; // color of an empty square
 const GAMEWIDTH = 100;
 const GAMEHEIGHT = 200;
 
-const TIMESCALE = 100;
 
 let activeGames = [];
 let completedGames = [];
 
 
 const POPULATION = 1000;
-const MUTATION_CHANCE = 0.5;
+const MUTATION_CHANCE = 0.01;
 
+let TIMESCALE = 100;
 let DRAW = true;
 
 let canvList = [];

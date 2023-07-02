@@ -34,19 +34,22 @@ class Drawer {
             this.ctx.beginPath();
             this.ctx.arc(START_OFFSET_X, ROW_GAP * i + START_OFFSET_Y, CIRCLE_RADIUS, 0, 2 * Math.PI);
             this.ctx.stroke();
-
         }
 
         for (let i = 0; i < hiddens; i++) {
             this.ctx.beginPath();
             this.ctx.arc(START_OFFSET_X + COLUMN_GAP, ROW_GAP * i + START_OFFSET_Y, CIRCLE_RADIUS, 0, 2 * Math.PI);
-            this.ctx.stroke();
+            this.ctx.fillStyle = Drawer.RainbowColor(nn.biasHidden.data[i][0], 1);
+            this.ctx.fill();
+            this.ctx.fillStyle = "black";
         }
 
         for (let i = 0; i < outputs; i++) {
             this.ctx.beginPath();
             this.ctx.arc(START_OFFSET_X + COLUMN_GAP * 2, ROW_GAP * i + START_OFFSET_Y, CIRCLE_RADIUS, 0, 2 * Math.PI);
-            this.ctx.stroke();
+            this.ctx.fillStyle = Drawer.RainbowColor(nn.biasOutput.data[i][0], 1);
+            this.ctx.fill();
+            this.ctx.fillStyle = "black";
         }
 
         nn.weightsIH.foreach((x, r, c) => {

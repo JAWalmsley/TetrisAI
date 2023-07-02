@@ -210,6 +210,27 @@ class Game {
         this.handleKeyEvent({ keyCode: SPACEBAR });
     }
 
+    getFitness() {
+        let ret = 0;
+        ret += this.score;
+        ret += this.blocksPlaced * 0.5;
+        for (let i = 0; i < this.cols; i++) {
+            let block = false;
+            for(let j = 0; j < this.rows; j++){
+                if(block && this.board[j][i] === VACANT) {
+                    // We have seen a block and then a vacant square, there is a hole
+                    ret -= 0.5;
+                    break;
+                }
+                if(this.board[j][i] !== VACANT) {
+                    block = true;
+                }
+            }
+        
+        }
+        return Math.max(ret, 0);
+    }
+
     update() {
         if (this.gameOver) {
             if (this.drawer) {
@@ -227,7 +248,7 @@ class Game {
             this.lastDrop = Date.now();
         }
         this.checkGameOver();
-        this.fitness = this.score + this.blocksPlaced*0.5;
+        this.fitness = this.getFitness();
         if (this.drawer) {
             this.scoreElement.innerHTML = this.fitness.toString();
         }
