@@ -36,7 +36,7 @@ class Matrix {
      */
     static multiply(a, b) {
         if(a.cols !== b.rows) {
-            console.error("Multiplication: Matrix dimensions don't match");
+            console.error("Multiplication: Matrix dimensions don't match", a.cols, b.rows);
             return undefined;
         }
         let output = new Matrix(a.rows, b.cols);

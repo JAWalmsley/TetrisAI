@@ -10,7 +10,12 @@ let activeGames = [];
 let completedGames = [];
 
 
-const POPULATION = 100
+const POPULATION = 1200;
+const MUTATION_CHANCE = 0.5;
+
+let DRAW = true;
+
+let canvList = [];
 
 for (let i = 0; i < POPULATION; i++) {
     let d = document.createElement("span");
@@ -23,32 +28,78 @@ for (let i = 0; i < POPULATION; i++) {
     let scoreCounter = document.createElement("div")
     d.appendChild(canv);
     d.appendChild(scoreCounter);
-    document.body.appendChild(d);
+    document.getElementById("gameDisplay").appendChild(d);
+    canvList.push(d);
     activeGames.push(new Game(canv, scoreCounter, TIMESCALE, false));
+}
+// Wild DOM hack to turn a HTMLCollection into an array
+let canvasses = Array.prototype.slice.call(canvList);
+
+let cv = document.getElementById("neuralDisplay");
+let draw = new Drawer(cv.getContext("2d"));
+
+
+function weighted_random(options) {
+    var i;
+
+    var weights = [options[0].fitness];
+
+    for (i = 1; i < options.length; i++)
+        weights[i] = options[i].fitness + weights[i - 1];
+
+    var random = Math.random() * weights[weights.length - 1];
+
+    for (i = 0; i < weights.length; i++)
+        if (weights[i] > random)
+            break;
+
+    return options[i];
 }
 
 function nextGeneration() {
     let outputPop = [];
-    let totalFitness = 0;
-    for (let entry of completedGames) {
-        totalFitness += entry.fitness;
-    }
-    for (let j = 0; j < POPULATION; j++) {
-        let i = 0;
-        let post = Math.random() * totalFitness;
-        while (post > 0) {
-            post -= completedGames[i].fitness;
-            i++;
+
+    // completedGames.sort((a, b) => (a.fitness > b.fitness) ? -1 : ((b.fitness > a.fitness) ? 1 : 0));
+    // console.log(completedGames.map(g => g.fitness));
+    draw.drawNN(completedGames[0].game.neuralNet);
+    let tempCanvasses = canvasses.slice().reverse();;
+    // for (let j = 0; j < POPULATION / 2; j++) {
+    //     for (let i = 0; i < 2; i++) {
+    //         let newBrain = completedGames[j].game.neuralNet.copy();
+    //         let c = tempCanvasses.pop();
+    //         // let c = canvasses[0];
+    //         let g;
+    //         // Draw the best from last generation, mutate every other one
+    //         if (j == 0 && i == 0 && DRAW) {
+    //             g = new Game(c.getElementsByTagName("canvas")[0], c.getElementsByTagName("div")[0], TIMESCALE, false, newBrain, true)
+    //         } else {
+    //             newBrain.applyMutations(MUTATION_CHANCE);
+    //             g = new Game(c.getElementsByTagName("canvas")[0], c.getElementsByTagName("div")[0], TIMESCALE, false, newBrain)
+    //         }
+    //         outputPop.push(g);
+    //     }
+    // }
+
+    while (outputPop.length < POPULATION) {
+        let newBrain = weighted_random(completedGames).game.neuralNet.copy();
+        let c = tempCanvasses.pop();
+        // let c = canvasses[0];
+        let g;
+        // Draw the best from last generation, mutate every other one
+        if (outputPop.length == 0 && DRAW) {
+            g = new Game(c.getElementsByTagName("canvas")[0], c.getElementsByTagName("div")[0], TIMESCALE, false, newBrain, true)
+        } else {
+            newBrain.applyMutations(MUTATION_CHANCE);
+            g = new Game(c.getElementsByTagName("canvas")[0], c.getElementsByTagName("div")[0], TIMESCALE, false, newBrain)
         }
-        i--;
-        let g = new Game(completedGames[j].game.canvas, completedGames[j].game.scoreElement, TIMESCALE, false, completedGames[i].game.neuralNet.copy().applyMutations());
         outputPop.push(g);
     }
+
+
     return outputPop;
 }
 
 function avg(array) {
-    console.log(array)
     let sum = 0;
     for (let i = 0; i < array.length; i++) {
         sum += array[i].fitness;
@@ -65,7 +116,7 @@ function updateGames() {
         }
     }
     if (activeGames.length == 0) {
-        console.log("all games finished", completedGames);
+        // console.log("all games finished", completedGames);
         console.log("Max fitness: " + Math.max(...completedGames.map(g => g.fitness)), "Avg fitness: " + avg(completedGames));
         activeGames = nextGeneration();
         completedGames = [];
