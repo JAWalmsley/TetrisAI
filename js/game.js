@@ -188,7 +188,7 @@ class Game {
 
     makeAIMove() {
         let output = this.neuralNet.getOutput(this.getInputs()).toArray();
-        let maxColumn = 0;;
+        let maxColumn = 0;
         for (let i = 0; i < this.cols; i++) {
             if (output[i] > output[maxColumn]) {
                 maxColumn = i;
@@ -202,7 +202,8 @@ class Game {
         }
         this.p.goToX(maxColumn - 1);
         for (let i = 0; i < maxRotation; i++) {
-            this.handleKeyEvent({ keyCode: UPARROW });
+            this.p.rotate();
+            // this.handleKeyEvent({ keyCode: UPARROW });
         }
 
         // Drop the piece where we decided
@@ -213,7 +214,6 @@ class Game {
         if (this.gameOver) {
             if (this.drawer) {
                 this.scoreElement.innerText = "Game over, score: " + this.score.toString();
-
             }
             return;
         }

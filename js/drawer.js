@@ -49,7 +49,7 @@ class Drawer {
             this.ctx.stroke();
         }
 
-        nn.weightsIH.map((x, r, c) => {
+        nn.weightsIH.foreach((x, r, c) => {
             if (Math.abs(x) < MIN_WEIGHT_DRAW) { return; }
             this.ctx.beginPath();
             this.ctx.moveTo(START_OFFSET_X, ROW_GAP * c + START_OFFSET_Y);
@@ -61,7 +61,7 @@ class Drawer {
             this.ctx.strokeStyle = "black";
         })
 
-        nn.weightsHO.map((x, r, c) => {
+        nn.weightsHO.foreach((x, r, c) => {
             if (Math.abs(x) < MIN_WEIGHT_DRAW) { return; }
             this.ctx.beginPath();
             this.ctx.moveTo(START_OFFSET_X + COLUMN_GAP, ROW_GAP * c + START_OFFSET_Y);

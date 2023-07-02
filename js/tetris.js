@@ -10,7 +10,7 @@ let activeGames = [];
 let completedGames = [];
 
 
-const POPULATION = 1200;
+const POPULATION = 1000;
 const MUTATION_CHANCE = 0.5;
 
 let DRAW = true;

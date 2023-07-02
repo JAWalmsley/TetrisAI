@@ -84,8 +84,7 @@ class Matrix {
         return ret;
     }
 
-    /**
-     * Same as map from arrays, apply function to every element (even across dimensions)
+    /** MUTATES array, apply function to every element (even across dimensions)
      * @param {function} callback 
      * @returns a copy of this matrix with the function applied to every element
      */
@@ -97,6 +96,19 @@ class Matrix {
             }
         }
         return this;
+    }
+
+    /**
+     * Same as map, but doesn't mutate the array
+     * @param {function} callback 
+     */
+    foreach(callback) {
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                let val = this.data[i][j];
+                callback(val, i, j);
+            }
+        }
     }
 
     /**
