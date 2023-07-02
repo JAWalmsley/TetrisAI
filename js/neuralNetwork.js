@@ -1,5 +1,3 @@
-
-
 class NeuralNetwork {
     /**
      * 
@@ -16,11 +14,13 @@ class NeuralNetwork {
             let hiddenSize = b;
             let outputSize = c;
             // Weights from input to hidden
-            this.weightsIH = new Matrix(hiddenSize, inputSize).randomize();
+            this.weightsIH = new Matrix(hiddenSize, inputSize);
             // Weights from hidden to output
-            this.weightsHO = new Matrix(outputSize, hiddenSize).randomize();
+            this.weightsHO = new Matrix(outputSize, hiddenSize);
+            // Weights from input to output
+            this.weightsOI = new Matrix(outputSize, inputSize).randomize();
             // Bias for hidden layer
-            this.biasHidden = new Matrix(hiddenSize, 1).randomize();
+            this.biasHidden = new Matrix(hiddenSize, 1);
             // Bias for output layer
             this.biasOutput = new Matrix(outputSize, 1).randomize();
         } else if (a instanceof Matrix) {
@@ -76,6 +76,14 @@ class NeuralNetwork {
         this.mutate(this.weightsHO, mutationChance);
         this.mutate(this.biasHidden, mutationChance);
         this.mutate(this.biasOutput, mutationChance);
+    }
+
+    createHiddenNode(input, output) {
+        this.weightsIH.expand(1, 0);
+        this.weightsIH.data[this.weightsIH.rows - 1][input] = 1;
+        this.weightsHO.expand(0, 1);
+        this.weightsHO.data[output][this.weightsHO.cols - 1] = this.weightsOI.data[output][input];
+        this.weightsOI.data[output][input] = 0;
     }
 
     toString() {

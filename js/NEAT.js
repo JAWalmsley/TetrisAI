@@ -14,7 +14,7 @@ class NEAT {
             let newBrain = new NeuralNetwork(this.numInputs, 0, this.numOutputs);
             let agent = {};
 
-            newBrain.applyMutations(this.mutationChance);
+            // newBrain.applyMutations(this.mutationChance);
 
             agent.brain = newBrain;
             agent.fitness = 0;
@@ -30,19 +30,41 @@ class NEAT {
         let mutateWeight = mw / totalChance;
 
         for (let agent of this.agents) {
-            if (Math.random() < this.mutationChance) {
+            let r = Math.random();
+            if (r > this.mutationChance) {
+                continue;
+            }
+            if(agent.brain.weightsIH.rows >= this.numInputs) {
                 continue;
             }
             let genome = this.NetToGenome(agent.brain);
             let rand = Math.random();
             if (rand < addNode) {
-                // while()
-                let breakGene = genome[Math.floor(Math.random() * (genome.length - 1))]
-                let input = breakGene.input;
-                let output = breakGene.output;
-                let g1 = new Gene(input, )
+                let breakGene;
+                while (true) {
+                    breakGene = genome[Math.floor(Math.random() * (genome.length - 1))];
+                    if (breakGene.input.startsWith('i') && breakGene.output.startsWith('o')) {
+                        break;
+                    }
+                }
+                console.log(this.agents.indexOf(agent), breakGene.input, breakGene.output);
+                // Remove 'i' or 'o' prefix
+                let input = breakGene.input.substring(1);
+                let output = breakGene.output.substring(1);
+                agent.brain.createHiddenNode(input, output, agent.brain.weights);
             } else if (rand < addNode + addConnection) {
+                // Limited number of attempts just in case everything is connected already
+                for(let i =0; i < this.numInputs * this.numOutputs; i++) {
+                    let input = Math.floor(Math.random() * agent.brain.weightsIH.cols);
+                    let hidden = Math.floor(Math.random() * agent.brain.weightsIH.rows);
+                    if(!agent.brain.weightsIH.data[hidden][input] || agent.brain.weightsIH.data[hidden][input] == 0) {
+                        console.log(this.agents.indexOf(agent), "making connection", input, hidden);
+                        agent.brain.weightsIH.data[hidden][input] = Math.random() * 2 - 1;
+                        break;
+                    }
+                }
             } else if (rand < addNode + addConnection + mutateWeight) {
+                
             }
         }
     }
@@ -55,6 +77,10 @@ class NEAT {
         });
         network.weightsHO.foreach((x, r, c) => {
             let g = new Gene(`h${c}`, `o${r}`, x, true, this.getInnovationNumber(`h${c}`, `o${r}`));
+            genome.push(g);
+        });
+        network.weightsOI.foreach((x, r, c) => {
+            let g = new Gene(`i${c}`, `o${r}`, x, true, this.getInnovationNumber(`i${c}`, `o${r}`));
             genome.push(g);
         });
         network.biasHidden.foreach((x, r, c) => {

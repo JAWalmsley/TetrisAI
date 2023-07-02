@@ -97,6 +97,18 @@ function updateGames() {
 }
 
 
+
+function set() {
+    let a = new NEAT(10, 1, 10, 10);
+    a.createPopulation();
+    a.performMutations(1, 0, 0);
+    a.performMutations(0, 1, 0);
+    return a;
+}
+
+let m =set();
+
+
 // setInterval(updateGames, 0.1)
 // while(true){
 //     updateGames();
