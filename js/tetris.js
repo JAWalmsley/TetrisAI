@@ -97,7 +97,7 @@ function updateGames() {
 }
 
 
-setInterval(updateGames, 0.1)
+// setInterval(updateGames, 0.1)
 // while(true){
 //     updateGames();
 // }

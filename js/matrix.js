@@ -1,4 +1,9 @@
 class Matrix {
+    /**
+     * access like matrix[row][column]
+     * @param {} rows 
+     * @param {*} cols 
+     */
     constructor(rows, cols) {
         this.rows = rows;
         this.cols = cols;

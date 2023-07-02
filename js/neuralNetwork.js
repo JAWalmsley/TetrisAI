@@ -1,6 +1,15 @@
 
 
 class NeuralNetwork {
+    /**
+     * 
+     * @param {Number} a Input size / IH weights 
+     * @param {Number} b Hidden size / HO weights
+     * @param {Number} c Output size / Bias hidden
+     * @param {*} d NA / Bias output
+     * @param {*} e Input labels
+     * @param {*} f Output labels
+     */
     constructor(a, b, c, d, e = [], f = []) {
         if (typeof a == "number") {
             let inputSize = a;
@@ -22,7 +31,6 @@ class NeuralNetwork {
         }
         this.inputLabels = e;
         this.outputLabels = f;
-
     }
 
     /**
