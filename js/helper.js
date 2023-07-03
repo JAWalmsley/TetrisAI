@@ -28,10 +28,14 @@ function weighted_random(options) {
     return options[i];
 }
 
-function avg(array) {
+function sumArr(array) {
     let sum = 0;
     for (let i = 0; i < array.length; i++) {
         sum += array[i];
     }
-    return sum / array.length
+    return sum;
+}
+
+function avg(array) {
+    return sumArr(array) / array.length
 }
