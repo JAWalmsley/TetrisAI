@@ -13,9 +13,6 @@ class NEAT {
         while (this.agents.length < this.population) {
             let newBrain = new NeuralNetwork(this.numInputs, 0, this.numOutputs);
             let agent = {};
-
-            // newBrain.applyMutations(this.mutationChance);
-
             agent.brain = newBrain;
             agent.fitness = 0;
 

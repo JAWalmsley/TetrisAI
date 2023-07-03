@@ -27,7 +27,7 @@ class Matrix {
      */
     add(b) {
         if (this.rows !== b.rows || this.cols !== b.cols) {
-            console.error("Addition: Matrix dimensions don't match");
+            console.error("Addition: Matrix dimensions don't match", this.rows, this.cols, b.rows, b.cols);
             return undefined;
         }
         this.map((v, i, j) => this.data[i][j] + b.data[i][j]);
@@ -133,11 +133,12 @@ class Matrix {
      * @param {Number} cols 
      */
     resize(rows, cols) {
+        console.log(rows, cols)
         rows = Math.max(rows, this.rows);
         cols = Math.max(cols, this.cols);
         for (let i = 0; i < rows; i++) {
-            if (this.data[i]) {
-                this.data[i].push(...Array(cols - this.cols).fill(0));
+            if (this.data[i] && this.data[i].length < cols) {
+                this.data[i].push(...Array(cols - this.data[i].length).fill(0));
             }
             else {
                 this.data.push(Array(cols).fill(0));

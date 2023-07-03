@@ -99,13 +99,15 @@ function updateGames() {
 
 
 function set() {
-    let a = new NEAT(10, 1, 10, 10);
+    let a = new NEAT(10, 1, 5, 10);
     a.createPopulation();
     a.performMutations(1, 1, 1);
     return a;
 }
 
 let m =set();
+
+console.log(m.agents[0].brain.getOutput([1, 1, 1, 1, 1]));
 
 
 // setInterval(updateGames, 0.1)

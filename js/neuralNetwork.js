@@ -63,6 +63,9 @@ class NeuralNetwork {
      * @returns {Matrix}
      */
     getOutput(inputData) {
+        this.weightsIH.resize(this.weightsIH.rows, this.weightsOI.cols);
+        this.weightsHO.resize(this.weightsOI.rows, this.weightsHO.cols);
+        this.biasOutput.resize(this.weightsOI.rows, 1);
         let input = Matrix.fromArray(inputData);
         // Multiply by weights to get hidden
         let hidden = Matrix.multiply(this.weightsIH, input);
@@ -72,7 +75,7 @@ class NeuralNetwork {
         hidden.map((x) => Math.tanh(x));
         // Multiply by weights to get output
         let output = Matrix.multiply(this.weightsHO, hidden);
-        output.add(Matrix.multiply(input, this.weightsOI))
+        output.add(Matrix.multiply(this.weightsOI, input))
         // Add biases
         output.add(this.biasOutput);
         // Apply activation function (tanh)
