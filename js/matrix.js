@@ -133,14 +133,13 @@ class Matrix {
      * @param {Number} cols 
      */
     resize(rows, cols) {
-        console.log(rows, cols)
         rows = Math.max(rows, this.rows);
         cols = Math.max(cols, this.cols);
         for (let i = 0; i < rows; i++) {
             if (this.data[i] && this.data[i].length < cols) {
                 this.data[i].push(...Array(cols - this.data[i].length).fill(0));
             }
-            else {
+            else if (!this.data[i]){
                 this.data.push(Array(cols).fill(0));
             }
         }

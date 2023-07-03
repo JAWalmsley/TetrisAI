@@ -46,7 +46,10 @@ class NeuralNetwork {
                     wOI.resize(g.out() + 1, g.in() + 1);
                     wOI.data[g.out()][g.in()] = g.weight;
                 } else if (g.layerOut() == 'h') {
-                    wIH.resize(g.out() + 1, g.in() + 1);
+                    if(wIH.data[g.out()] == undefined || wIH.data[g.out()][g.in()] == undefined)
+                    {
+                        wIH.resize(g.out() + 1, g.in() + 1);
+                    }
                     wIH.data[g.out()][g.in()] = g.weight;
                 }
             } else if(g.layerIn() == 'h') {
@@ -63,9 +66,15 @@ class NeuralNetwork {
      * @returns {Matrix}
      */
     getOutput(inputData) {
-        this.weightsIH.resize(this.weightsIH.rows, this.weightsOI.cols);
-        this.weightsHO.resize(this.weightsOI.rows, this.weightsHO.cols);
-        this.biasOutput.resize(this.weightsOI.rows, 1);
+        let numInputs = inputData.length;
+        let numHidden = Math.max(this.weightsHO.cols, this.weightsIH.rows);
+        let numOutputs = Math.max(this.weightsOI.rows, this.weightsHO.rows);
+        // Resize matrices for multiplication
+        this.weightsIH.resize(numHidden, numInputs);
+        this.weightsHO.resize(numOutputs, numHidden);
+        this.weightsOI.resize(numOutputs, numInputs);
+        this.biasOutput.resize(numOutputs, 1);
+        this.biasHidden.resize(numHidden, 1);
         let input = Matrix.fromArray(inputData);
         // Multiply by weights to get hidden
         let hidden = Matrix.multiply(this.weightsIH, input);

@@ -41,7 +41,7 @@ let cv = document.getElementById("neuralDisplay");
 let draw = new Drawer(cv.getContext("2d"));
 
 function nextGeneration() {
-    
+
     let outputPop = [];
 
     // completedGames.sort((a, b) => (a.fitness > b.fitness) ? -1 : ((b.fitness > a.fitness) ? 1 : 0));
@@ -93,22 +93,31 @@ function updateGames() {
         console.log("restarting...")
     }
     // requestAnimationFrame(updateGames);
-
 }
 
 
 
+
 function set() {
-    let a = new NEAT(10, 1, 5, 10);
+    let a = new NEAT(1, 1, 5, 10);
     a.createPopulation();
     a.performMutations(1, 1, 1);
     return a;
 }
 
-let m =set();
+let m = set();
 
-console.log(m.agents[0].brain.getOutput([1, 1, 1, 1, 1]));
+m.nextGeneration();
+console.log(m);
+m.agents[0].brain.getOutput([1, 1, 1, 1, 1])
+draw.drawNN(m.agents[0].brain);
 
+setInterval(() => {
+    m.nextGeneration();
+    console.log(m);
+    m.agents[0].brain.getOutput([1, 1, 1, 1, 1])
+    draw.drawNN(m.agents[0].brain);
+}, 5000)
 
 // setInterval(updateGames, 0.1)
 // while(true){
