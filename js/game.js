@@ -7,7 +7,7 @@ const SPACEBAR = 32;
 const ROWCOMPLETEBONUS = 200;
 
 class Game {
-    constructor(canvas, scoreElement, timescale, keyboardControlled, draw, neuralNet) {
+    constructor(canvas, scoreElement, timescale, keyboardControlled, draw, neuralNet, gameOverCallback=null) {
         this.fitness = 0;
         this.canvas = canvas;
         if (draw) {
@@ -21,6 +21,7 @@ class Game {
         this.gameOver = false;
         this.blocksPlaced = 0;
         this.lastDrop = Date.now();
+        this.gameOverCallback = gameOverCallback;
 
         if (keyboardControlled) {
             document.addEventListener("keydown", this.handleKeyEvent.bind(this));
@@ -101,6 +102,7 @@ class Game {
         for (let c = 0; c < this.cols; c++) {
             if (this.board[0][c] !== VACANT) {
                 this.gameOver = true;
+                this.gameOverCallback(this.getFitness());
                 return;
             }
         }

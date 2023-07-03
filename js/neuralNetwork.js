@@ -45,18 +45,31 @@ class NeuralNetwork {
                 if (g.layerOut() == 'o') {
                     wOI.resize(g.out() + 1, g.in() + 1);
                     wOI.data[g.out()][g.in()] = g.weight;
+                    bO.resize(g.out(), 1);
                 } else if (g.layerOut() == 'h') {
                     if(wIH.data[g.out()] == undefined || wIH.data[g.out()][g.in()] == undefined)
                     {
                         wIH.resize(g.out() + 1, g.in() + 1);
                     }
+                    bH.resize(g.out(), 1);
                     wIH.data[g.out()][g.in()] = g.weight;
                 }
             } else if(g.layerIn() == 'h') {
                 wHO.resize(g.out() + 1, g.in() + 1);
+                bH.resize(g.in(), 1);
                 wHO.data[g.out()][g.in()] = g.weight;
+            } else if(g.layerIn() == 'b') {
+                if(g.layerOut() == 'h') {
+                    bH.resize(g.out() + 1, 1);
+                    bH.data[g.out()][0] = g.weight;
+                } else if(g.layerOut() == 'o') {
+                    bO.resize(g.out() + 1, 1);
+                    bO.data[g.out()][0] = g.weight;
+                }
             }
         });
+        
+        bO.resize(wHO.rows, 1);
         return new NeuralNetwork(wIH, wHO, bH, bO, wOI, inputLabels, outputLabels);
     }
 
@@ -66,9 +79,9 @@ class NeuralNetwork {
      * @returns {Matrix}
      */
     getOutput(inputData) {
-        let numInputs = inputData.length;
-        let numHidden = Math.max(this.weightsHO.cols, this.weightsIH.rows);
-        let numOutputs = Math.max(this.weightsOI.rows, this.weightsHO.rows);
+        let numInputs = this.getDimensions()[0];
+        let numHidden = this.getDimensions()[1];
+        let numOutputs = this.getDimensions()[2];
         // Resize matrices for multiplication
         this.weightsIH.resize(numHidden, numInputs);
         this.weightsHO.resize(numOutputs, numHidden);
@@ -116,12 +129,19 @@ class NeuralNetwork {
         this.mutate(this.biasOutput, mutationChance);
     }
 
-    createHiddenNode(input, output) {
-        this.weightsIH.expand(1, 0);
-        this.weightsIH.data[this.weightsIH.rows - 1][input] = 1;
-        this.weightsHO.expand(0, 1);
-        this.weightsHO.data[output][this.weightsHO.cols - 1] = this.weightsOI.data[output][input];
-        this.weightsOI.data[output][input] = 0;
+    // createHiddenNode(input, output) {
+    //     this.weightsIH.expand(1, 0);
+    //     this.weightsIH.data[this.weightsIH.rows - 1][input] = 1;
+    //     this.weightsHO.expand(0, 1);
+    //     this.weightsHO.data[output][this.weightsHO.cols - 1] = this.weightsOI.data[output][input];
+    //     this.weightsOI.data[output][input] = 0;
+    // }
+
+    getDimensions() {
+        let numInputs = Math.max(this.weightsIH.cols, this.weightsOI.cols);
+        let numHidden = Math.max(this.weightsHO.cols, this.weightsIH.rows);
+        let numOutputs = Math.max(this.weightsOI.rows, this.weightsHO.rows);
+        return [numInputs, numHidden, numOutputs]
     }
 
     toString() {

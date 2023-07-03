@@ -27,11 +27,11 @@ class Drawer {
         const COLUMN_GAP = 100;
         const ROW_GAP = 20;
 
-        const MIN_WEIGHT_DRAW = 0;
+        const MIN_WEIGHT_DRAW = 0.01;
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-        let inputs = nn.weightsOI.cols;
-        let hiddens = nn.weightsIH.rows;
-        let outputs = nn.weightsOI.rows;
+        let inputs = nn.getDimensions()[0];
+        let hiddens = nn.getDimensions()[1];
+        let outputs = nn.getDimensions()[2];
 
         let inLabels = nn.inputLabels;
         let outLabels = nn.outputLabels;
@@ -50,7 +50,7 @@ class Drawer {
         for (let i = 0; i < hiddens; i++) {
             this.ctx.beginPath();
             this.ctx.arc(START_OFFSET_X + COLUMN_GAP, ROW_GAP * i + START_OFFSET_Y, CIRCLE_RADIUS, 0, 2 * Math.PI);
-            this.ctx.fillStyle = Drawer.RainbowColor(nn.biasHidden.data[i][0], 1);
+            // this.ctx.fillStyle = Drawer.RainbowColor(nn.biasHidden.data[i][0], 1);
             this.ctx.fill();
             this.ctx.fillStyle = "black";
         }
