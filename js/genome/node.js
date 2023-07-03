@@ -6,11 +6,10 @@ class Node {
      * @param {*} isOutput 
      * @param {*} bias 
      */
-    constructor(layer, isOutput, bias, id) {
+    constructor(layer, isOutput, id) {
         // Layer 0: input, hidden after
         this.layer = layer;
         this.isOutput = isOutput;
-        this.bias = bias;
         this.id = id;
 
         this.outboundConnections = [];
@@ -37,12 +36,12 @@ class Node {
             // Input layer has one input and no activation function
             this.outputValue = this.inputValues[0]
         } else {
-            this.outputValue = Math.tanh(sumArr(this.inputValues) + this.bias);
+            this.outputValue = Math.tanh(sumArr(this.inputValues));
         }
     }
 
     copy() {
-        return new Node(this.layer, this.isOutput, this.bias, this.id);
+        return new Node(this.layer, this.isOutput, this.id);
     }
 
     outputsTo(node) {
