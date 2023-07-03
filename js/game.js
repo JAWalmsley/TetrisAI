@@ -33,7 +33,7 @@ class Game {
             }
             inlbl.push("Z", "S", "T", "O", "L", "I", "J");
             inlbl.push("Piece Y", "Piece X", "Piece Rotation");
-            this.neuralNet = new NeuralNetwork(this.cols + 10, this.cols + 7, 3, null, inlbl, ["left", "right", "rotate"]);
+            this.neuralNet = new NeuralNetwork(this.cols + 10, this.cols + 7, 3, null, null, inlbl, ["left", "right", "rotate"]);
         }
 
         this.setupBoard();

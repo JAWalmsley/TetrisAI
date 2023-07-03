@@ -8,7 +8,7 @@ class NeuralNetwork {
      * @param {*} e Input labels
      * @param {*} f Output labels
      */
-    constructor(a, b, c, d, e = [], f = []) {
+    constructor(a, b, c, d, e, inlb = [], outlb = []) {
         if (typeof a == "number") {
             let inputSize = a;
             let hiddenSize = b;
@@ -28,9 +28,33 @@ class NeuralNetwork {
             this.weightsHO = b;
             this.biasHidden = c;
             this.biasOutput = d;
+            this.weightsOI = e;
         }
-        this.inputLabels = e;
-        this.outputLabels = f;
+        this.inputLabels = inlb;
+        this.outputLabels = outlb;
+    }
+
+    static fromGenome(genome, inputLabels = [], outputLabels = []) {
+        let wIH = new Matrix(1, 1);
+        let wHO = new Matrix(1, 1);
+        let wOI = new Matrix(1, 1);
+        let bH = new Matrix(1, 1);
+        let bO = new Matrix(1, 1);
+        genome.forEach((g) => {
+            if (g.layerIn() == 'i') {
+                if (g.layerOut() == 'o') {
+                    wOI.resize(g.out() + 1, g.in() + 1);
+                    wOI.data[g.out()][g.in()] = g.weight;
+                } else if (g.layerOut() == 'h') {
+                    wIH.resize(g.out() + 1, g.in() + 1);
+                    wIH.data[g.out()][g.in()] = g.weight;
+                }
+            } else if(g.layerIn() == 'h') {
+                wHO.resize(g.out() + 1, g.in() + 1);
+                wHO.data[g.out()][g.in()] = g.weight;
+            }
+        });
+        return new NeuralNetwork(wIH, wHO, bH, bO, wOI, inputLabels, outputLabels);
     }
 
     /**
@@ -48,6 +72,7 @@ class NeuralNetwork {
         hidden.map((x) => Math.tanh(x));
         // Multiply by weights to get output
         let output = Matrix.multiply(this.weightsHO, hidden);
+        output.add(Matrix.multiply(input, this.weightsOI))
         // Add biases
         output.add(this.biasOutput);
         // Apply activation function (tanh)
@@ -64,11 +89,12 @@ class NeuralNetwork {
     copy() {
         let wih = this.weightsIH.copy();
         let who = this.weightsHO.copy();
+        let woi = this.weightsOI.copy();
         let bh = this.biasHidden.copy();
         let bo = this.biasOutput.copy();
         let il = this.inputLabels.slice();
         let ol = this.outputLabels.slice();
-        return new NeuralNetwork(wih, who, bh, bo, il, ol);
+        return new NeuralNetwork(wih, who, bh, bo, woi, il, ol);
     }
 
     applyMutations(mutationChance) {

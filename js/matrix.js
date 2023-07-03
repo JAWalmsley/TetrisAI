@@ -133,9 +133,8 @@ class Matrix {
      * @param {Number} cols 
      */
     resize(rows, cols) {
-        if (rows < this.rows || cols < this.cols) {
-            console.error("Resize: Matrix dimensions can only increase");
-        }
+        rows = Math.max(rows, this.rows);
+        cols = Math.max(cols, this.cols);
         for (let i = 0; i < rows; i++) {
             if (this.data[i]) {
                 this.data[i].push(...Array(cols - this.cols).fill(0));

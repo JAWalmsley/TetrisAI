@@ -40,6 +40,7 @@ class NEAT {
             let genome = this.NetToGenome(agent.brain);
             let rand = Math.random();
             if (rand < addNode) {
+                // Create new hidden node
                 let breakGene;
                 while (true) {
                     breakGene = genome[Math.floor(Math.random() * (genome.length - 1))];
@@ -47,26 +48,33 @@ class NEAT {
                         break;
                     }
                 }
-                console.log(this.agents.indexOf(agent), breakGene.input, breakGene.output);
+                // Remove old gene
+                genome.splice(genome.indexOf(breakGene), 1);
                 // Remove 'i' or 'o' prefix
-                let input = breakGene.input.substring(1);
-                let output = breakGene.output.substring(1);
-                agent.brain.createHiddenNode(input, output, agent.brain.weights);
+                let input = breakGene.in();
+                let output = breakGene.out();
+                let g1 = this.createGene(input, 'i', agent.brain.weightsIH.rows, 'h', 1);
+                let g2 = this.createGene(agent.brain.weightsIH.rows, 'h', output, 'o', breakGene.weight);
+                genome.push(g1);
+                genome.push(g2);
             } else if (rand < addNode + addConnection) {
-                // Limited number of attempts just in case everything is connected already
-                for(let i =0; i < this.numInputs * this.numOutputs; i++) {
-                    let input = Math.floor(Math.random() * agent.brain.weightsIH.cols);
-                    let hidden = Math.floor(Math.random() * agent.brain.weightsIH.rows);
-                    if(!agent.brain.weightsIH.data[hidden][input] || agent.brain.weightsIH.data[hidden][input] == 0) {
-                        console.log(this.agents.indexOf(agent), "making connection", input, hidden);
-                        agent.brain.weightsIH.data[hidden][input] = Math.random() * 2 - 1;
-                        break;
-                    }
-                }
+                // Add connection between two existing nodes
+                let input = Math.floor(Math.random() * agent.brain.weightsIH.cols);
+                let hidden = Math.floor(Math.random() * agent.brain.weightsIH.rows);
+                let newGene = this.createGene(input, 'i', hidden, 'h',Math.random() * 2 - 1);
+                genome = genome.filter(gene => gene.innovation != newGene.innovation);
+                genome.push(newGene);
             } else if (rand < addNode + addConnection + mutateWeight) {
-                
+                //Mutate weight of a random connection
+                let gene = genome[Math.floor(Math.random() * genome.length)];
+                gene.weight += gaussianRandom();
             }
+            agent.brain = NeuralNetwork.fromGenome(genome);
         }
+    }
+
+    createGene(input, inLayer, output, outLayer, weight) {
+        return new Gene(`${inLayer}${input}`, `${outLayer}${output}`, weight, true, this.getInnovationNumber(`i${input}`, `o${output}`));
     }
 
     NetToGenome(network) {

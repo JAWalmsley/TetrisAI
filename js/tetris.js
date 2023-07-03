@@ -101,8 +101,7 @@ function updateGames() {
 function set() {
     let a = new NEAT(10, 1, 10, 10);
     a.createPopulation();
-    a.performMutations(1, 0, 0);
-    a.performMutations(0, 1, 0);
+    a.performMutations(1, 1, 1);
     return a;
 }
 
