@@ -61,6 +61,7 @@ class ATNeuralNetwork {
     }
 
     crossover(other) {
+        this.refreshNodes();
         let child = new ATNeuralNetwork(this.numInputs, this.numOutputs, this.inputLabels, this.outputLabels);
 
         for (let node of this.nodes) {
@@ -91,7 +92,7 @@ class ATNeuralNetwork {
     }
 
     geneticDistance(other) {
-        let c1 = 1, c2 = 1, c3 = 0.4;
+        let c1 = 1, c2 = 1, c3 = 0.1;
         let E = 0;
         let D = 0;
         let N = Math.max(this.connections.length, other.connections.length);
@@ -110,8 +111,6 @@ class ATNeuralNetwork {
             let otherconn = this.getMatchingConnection(conn.getInnovation());
             if (!otherconn) {
                 D++;
-            } else {
-                weightDiffs.push(Math.abs(otherconn.weight - conn.weight))
             }
         }
 
@@ -121,15 +120,16 @@ class ATNeuralNetwork {
     }
 
     applyMutations(weightChance, addChance, splitChance) {
+        this.refreshNodes();
         // Mutate weights
         for (let conn of this.connections) {
             let rand = Math.random();
             // 5% chance of completely new weight
-            if(rand < 0.05) {
+            if (rand < 0.05) {
                 conn.weight = Math.random() * 2 - 1;
             }
             else if (rand < weightChance) {
-                conn.weight += gaussianRandom() / 50;
+                conn.weight += gaussianRandom() * 0.1;
             }
         }
 
@@ -166,9 +166,11 @@ class ATNeuralNetwork {
 
             let newNode = new Node(pickedConn.fromNode.layer + 1, false, this.nodes.length);
             // Create a new layer between the two existing layers, shift the ones on it down
-            for (let node of this.nodes) {
-                if (node.layer > pickedConn.fromNode.layer) {
-                    node.layer++;
+            if (pickedConn.fromNode.layer == pickedConn.toNode.layer - 1) {
+                for (let node of this.nodes) {
+                    if (node.layer > pickedConn.fromNode.layer) {
+                        node.layer++;
+                    }
                 }
             }
 
@@ -213,13 +215,16 @@ class ATNeuralNetwork {
             layerNodes[node.layer]++;
         }
 
+        layerNodes = Array.from(layerNodes, item => item || 0);
+
         // Nodes can be connected to any layer greater than their own
         for (let i = 0; i < layerNodes.length - 1; i++) {
             for (let j = i + 1; j < layerNodes.length; j++) {
                 maximum += layerNodes[i] * layerNodes[j];
             }
         }
-        return maximum == this.connections.length;
+        // console.log(maximum, layerNodes, this.connections.length)
+        return maximum <= this.connections.length;
     }
 
     copy() {

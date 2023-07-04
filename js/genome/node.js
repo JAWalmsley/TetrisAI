@@ -36,7 +36,7 @@ class Node {
             // Input layer has one input and no activation function
             this.outputValue = this.inputValues[0]
         } else {
-            this.outputValue = Math.tanh(sumArr(this.inputValues));
+            this.outputValue = sumArr(this.inputValues) > 0.5 ? 1 : 0;
         }
         for(let conn of this.outboundConnections) {
             conn.toNode.addInput(this.outputValue * conn.weight);

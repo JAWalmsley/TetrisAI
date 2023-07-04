@@ -16,12 +16,14 @@ class NEAT {
             let network = new ATNeuralNetwork(this.numInputs, this.numOutputs, this.inputLabels, this.outputLabels);
             network.initialize();
             network.refreshNodes();
-            network.applyMutations(0.8, 0.05, 0.03);
+            // network.applyMutations(0.8, 0.05, 0.0);
             this.agents.push({ brain: network, fitness: 0 });
         }
     }
 
     nextGeneration() {
+        let ELITISM = 0.2;
+
         this.speciate(3);
         console.log(this.species.length);
         let totalPopulationFitness = 0;
@@ -33,42 +35,23 @@ class NEAT {
             let nextPop = [];
             species.members.sort((a, b) => b.fitness - a.fitness);
             // Elitism: Add top 20% of agents to next generation
-            for (let i = 0; i < Math.min(Math.floor(nextGenSize * 0.2), species.members.length); i++) {
-                nextPop.push({ brain: species.members[i].brain.copy(), fitness: 0 });
+            for (let i = 0; i < Math.min(Math.floor(nextGenSize * ELITISM), species.members.length); i++) {
+                let newBrain = species.members[i].brain.copy();
+                // newBrain.applyMutations(1, 0.05, 0.0003);
+                nextPop.push({ brain: newBrain, fitness: 0 });
             }
             // Crossover to reproduct and fill the next generation
-            for (let i = 0; i < Math.floor(nextGenSize * 0.8); i++) {
+            for (let i = 0; i < Math.floor(nextGenSize * (1-ELITISM)); i++) {
                 let rand1 = this.naturalSelection(species.members).brain;
                 let rand2 = this.naturalSelection(species.members).brain;
                 let newBrain = rand1.crossover(rand2);
-                newBrain.applyMutations(0.8, 0.05, 0.03);
+                newBrain.applyMutations(0.8, 0.05, 0.0003);
                 nextPop.push({ brain: newBrain, fitness: 0 });
             }
             // species.representative = species.members[Math.floor(Math.random() * species.members.length)].brain;
             this.agents.push(...nextPop);
             species.members = nextPop;
         }
-
-        // for(let agent of this.agents) {
-        //     agent.brain.applyMutations(0.8, 0.05, 0.03);
-        // }
-
-        // let nextPop = [];
-        // this.agents.sort((a, b) => b.fitness - a.fitness);
-        // // Add top 20% of agents to next generation
-        // for (let i = 0; i < this.population * 0.2; i++) {
-        //     nextPop.push({ brain: this.agents[i].brain.copy(), fitness: 0 });
-        // }
-        // // Crossover fill the next 80% of population
-        // for (let i = 0; i < this.population * 0.8; i++) {
-        //     let rand1 = this.agents[Math.floor(Math.random() * this.agents.length)].brain;
-        //     let rand2 = this.agents[Math.floor(Math.random() * this.agents.length)].brain;
-        //     nextPop.push({ brain: rand1.crossover(rand2), fitness: 0 });
-        // }
-        // for(let agent of nextPop) {
-        //     agent.brain.applyMutations(0.8, 0.05, 0.03);
-        // }
-        // this.agents = nextPop;
     }
 
     speciate(threshold) {
@@ -94,8 +77,8 @@ class NEAT {
             }
         })
 
-        // Remove any species with no members or just one (can't reproduce)
-        this.species = this.species.filter((species) => species.members.length > 1);
+        // Remove any species with no members
+        this.species = this.species.filter((species) => species.members.length > 0);
     }
 
     naturalSelection(agentList) {
@@ -110,5 +93,6 @@ class NEAT {
                 return agent;
             }
         }
+        console.error("didnt select anything!!!", agentList, totalFitness, rand)
     }
 }

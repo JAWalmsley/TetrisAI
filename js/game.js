@@ -79,6 +79,16 @@ class Game {
         return m;
     }
 
+    boardToArray() {
+        let output = [];
+        for(let row of this.board) {
+            for(let cell of row) {
+                output.push(cell === VACANT ? 0 : 1);
+            }
+        }
+        return output;
+    }
+
     handleKeyEvent(event) {
         if (event.keyCode == LEFTARROW) {
             this.p.moveLeft();
@@ -160,6 +170,7 @@ class Game {
             // Normalized to [0, 1] because neural networks like that kinda stuff
             ret.push(height / this.rows);
         }
+        // ret.push(...this.boardToArray());
 
         // Type of piece up next as input
         // We give each possible tetromino its own input neuron because that is more optimal

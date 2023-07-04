@@ -22,29 +22,40 @@ class Drawer {
 
     drawNN(nn) {
         const START_OFFSET_X = 100;
-        const START_OFFSET_Y = 50;
-        const CIRCLE_RADIUS = 5;
+        const START_OFFSET_Y = 10;
         const COLUMN_GAP = 50;
         const ROW_GAP = 20;
 
-        const MIN_WEIGHT_DRAW = 0.1;
+        const MIN_WEIGHT_DRAW = 0;
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         let layerHeights = {};
         let nodePositions = {};
         let nodes = nn.nodes.toSorted((a, b) => a.id - b.id);
         for (let i = 0; i < nodes.length; i++) {
+            let size = 5;
             let node = nodes[i];
+            if(node.isOutput) {
+                size = 10;
+            }
             this.ctx.beginPath();
             if (layerHeights[node.layer]) {
                 layerHeights[node.layer]++;
             } else {
                 layerHeights[node.layer] = 1;
             }
-            let x = START_OFFSET_X + COLUMN_GAP * node.layer;
+            let xoff = node.layer*0.5;
+            // if (node.layer > 0 && !node.isOutput) {
+            //     xoff = 1;
+            //     layerHeights[node.layer]-=1;
+            // }
+            // if (node.isOutput) {
+            //     xoff = 2;
+            // }
+            let x = START_OFFSET_X + COLUMN_GAP * xoff;
             let y = ROW_GAP * layerHeights[node.layer] + START_OFFSET_Y;
             nodePositions[node.id] = { x: x, y: y };
-            this.ctx.arc(x, y, CIRCLE_RADIUS, 0, 2 * Math.PI);
-            // this.ctx.fillStyle = Drawer.RainbowColor(nn.biasHidden.data[i][0], 1);
+            this.ctx.arc(x, y, size, 0, 2 * Math.PI);
+            this.ctx.fillStyle = Drawer.RainbowColor(node.outputValue, 1);
             this.ctx.fill();
             this.ctx.fillStyle = "black";
         }
@@ -60,11 +71,31 @@ class Drawer {
             this.ctx.lineTo(nodePositions[conn.toNode.id].x, nodePositions[conn.toNode.id].y);
             this.ctx.stroke();
         }
-        
+
         for (let i = 0; i < nn.inputLabels.length; i++) {
             this.ctx.textAlign = "right";
             this.ctx.fontSize = "30px";
             this.ctx.fillText(nn.inputLabels[i], START_OFFSET_X - 10, ROW_GAP * (i + 1) + START_OFFSET_Y);
+        }
+    }
+
+    drawGrid(data, dim) {
+        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        let row = 0;
+        let col = 0;
+        for (let item of data) {
+            this.ctx.beginPath();
+            this.ctx.arc(20 + row * 40, 20 + col * 40, 10, 0, 2 * Math.PI);
+            this.ctx.fillStyle = Drawer.RainbowColor(item, 1);
+            this.ctx.fill();
+            if (row == dim - 1) {
+                row = 0;
+                col++;
+            }
+            else {
+                row++;
+
+            }
         }
     }
 }
