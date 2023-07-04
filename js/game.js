@@ -214,7 +214,6 @@ class Game {
         let output = this.neuralNet.getOutput(this.getInputs());
         let maxOutputIndex = -1;
         let maxOutput = -10;
-        let changed = false;
         for (let i = 0; i < output.length; i++) {
             if (output[i] > maxOutput) {
                 maxOutput = output[i];
@@ -230,6 +229,9 @@ class Game {
                 break;
             case 2:
                 this.handleKeyEvent({keyCode: UPARROW});
+                break;
+            case 3:
+                // Do nothing
                 break;
         }
         // let maxRotation = 0;

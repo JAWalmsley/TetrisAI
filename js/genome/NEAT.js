@@ -1,7 +1,7 @@
 const ELITISM = 0.5;
 const WEIGHT = 0.8;
 const NEWCONN = 0.05;
-const NEWNODE = 0.003;
+const NEWNODE = 0.03;
 
 class NEAT {
     constructor(population, numInputs, numOutputs, inputLabels, outputLabels) {

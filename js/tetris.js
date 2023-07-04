@@ -57,7 +57,7 @@ for (let i = 0; i < 10; i++) {
 inlbl.push("Z", "S", "T", "O", "L", "I", "J");
 inlbl.push("Piece Y", "Piece X", "Piece Rotation");
 
-let NEATManager = new NEAT(POPULATION, 10 + 10 + 1, 3, inlbl, ["left", "right", "rotate"]);
+let NEATManager = new NEAT(POPULATION, 10 + 10 + 1, 4, inlbl, ["left", "right", "rotate"]);
 NEATManager.createPopulation();
 
 function nextGeneration() {
@@ -125,4 +125,4 @@ function updateGames() {
 
 setUp();
 updateGames();
-setInterval(updateGames, 0.01)
+setInterval(updateGames, 1)

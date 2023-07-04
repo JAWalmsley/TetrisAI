@@ -79,13 +79,31 @@ class Drawer {
         }
     }
 
-    drawGrid(data, dim) {
+    drawGrid(data, dim, smallData, smallDim) {
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         let row = 0;
         let col = 0;
+       
+        
+        let sizeDiff = (dim-1)/(smallDim-1)
+        for (let item of smallData) {
+            this.ctx.beginPath();
+            this.ctx.arc(20 + row * (40*sizeDiff), 20 + col * (40*sizeDiff), 2, 0, 2 * Math.PI);
+            this.ctx.fillStyle = Drawer.RainbowColor(item?1:0, 1);
+            this.ctx.fill();
+            if (row == smallDim - 1) {
+                row = 0;
+                col++;
+            }
+            else {
+                row++;
+            }
+        }
+        row = 0;
+        col = 0;
         for (let item of data) {
             this.ctx.beginPath();
-            this.ctx.arc(20 + row * 40, 20 + col * 40, 10, 0, 2 * Math.PI);
+            this.ctx.arc(20 + row * 40, 20 + col * 40, 5, 0, 2 * Math.PI);
             this.ctx.fillStyle = Drawer.RainbowColor(item, 1);
             this.ctx.fill();
             if (row == dim - 1) {

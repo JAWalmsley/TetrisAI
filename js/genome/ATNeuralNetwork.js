@@ -96,7 +96,7 @@ class ATNeuralNetwork {
         let E = 0;
         let D = 0;
         let N = Math.max(this.connections.length, other.connections.length);
-        // N = 1;
+        N = 1;
         let weightDiffs = [];
 
         for (let conn of this.connections) {

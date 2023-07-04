@@ -29,7 +29,7 @@ function nextGeneration() {
 let intr;
 let best;
 
-function getOutputs(agent) {
+function getOutputs(inputs, agent) {
 
     let agentOut = [];
     for (let i = 0; i < inputs.length; i++) {
@@ -40,17 +40,24 @@ function getOutputs(agent) {
 }
 
 let inputs = [[0, 0], [1, 0], [0, 1], [1, 1]];
+let smallInputs = [];
+for (i = 0; i <= 1; i += 0.2) {
+    for (j = 0; j <= 1; j += 0.2) {
+        smallInputs.push([i, j]);
+    }
+}
+console.log(smallInputs)
 let desiredOutputs = [0, 1, 1, 0];
 function game() {
     best = null;
     for (let agent of NM.agents) {
-        
-        let o = getOutputs(agent);
+
+        let o = getOutputs(inputs, agent);
         // o = [0, 1, 1, 0]
         for (let i = 0; i < o.length; i++) {
             agent.fitness += 2 - Math.abs(o[i] - desiredOutputs[i]);
         }
-        if(!best || agent.fitness > best.fitness) {
+        if (!best || agent.fitness > best.fitness) {
             best = agent;
         }
 
@@ -61,10 +68,12 @@ function game() {
             clearInterval(intr);
             break;
         }
-        
+
     }
     drawers[0].drawNN(best.brain);
-    drawers[1].drawGrid(getOutputs(best), 2)
+    drawers[1].drawGrid(getOutputs(inputs, best), 2, getOutputs(smallInputs, best), 6)
+    // console.log(smallInputs)
+    // console.log(getOutputs(smallInputs, best))
     console.log("Gen", generationNumber++,
         "Max fitness:", best.fitness,
         "Avg fitness:", avg(NM.agents.map(x => x.fitness)));
