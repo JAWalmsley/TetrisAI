@@ -123,8 +123,13 @@ class ATNeuralNetwork {
     applyMutations(weightChance, addChance, splitChance) {
         // Mutate weights
         for (let conn of this.connections) {
-            if (Math.random() < weightChance) {
-                conn.weight += gaussianRandom(0, 0.5);
+            let rand = Math.random();
+            // 5% chance of completely new weight
+            if(rand < 0.05) {
+                conn.weight = Math.random() * 2 - 1;
+            }
+            else if (rand < weightChance) {
+                conn.weight += gaussianRandom() / 50;
             }
         }
 

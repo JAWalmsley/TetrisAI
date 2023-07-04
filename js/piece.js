@@ -2,12 +2,12 @@
 
 const PIECES = [
     [Z, "red"],
-    // [S, "green"],
-    // [T, "#aa00aa"],
-    // [O, "blue"],
-    // [L, "purple"],
-    // [I, "cyan"],
-    // [J, "orange"]
+    [S, "green"],
+    [T, "#aa00aa"],
+    [O, "blue"],
+    [L, "purple"],
+    [I, "cyan"],
+    [J, "orange"]
 ];
 
 function Piece(board, drawer, tetromino, color) {

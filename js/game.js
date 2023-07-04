@@ -259,7 +259,7 @@ class Game {
     update() {
         this.drawBoard();
         if (this.gameOver) {
-            if (this.drawer) {
+            if (this.scoreElement) {
                 this.scoreElement.innerText = "Game over, score: " + this.score.toString();
             }
             return;
@@ -275,7 +275,7 @@ class Game {
         }
         this.checkGameOver();
         this.fitness = this.getFitness();
-        if (this.drawer) {
+        if (this.scoreElement) {
             this.scoreElement.innerHTML = this.fitness.toString();
         }
     }

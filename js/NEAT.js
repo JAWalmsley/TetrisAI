@@ -38,8 +38,8 @@ class NEAT {
             }
             // Crossover to reproduct and fill the next generation
             for (let i = 0; i < Math.floor(nextGenSize * 0.8); i++) {
-                let rand1 = species.members[Math.floor(Math.random() * species.members.length)].brain;
-                let rand2 = species.members[Math.floor(Math.random() * species.members.length)].brain;
+                let rand1 = this.naturalSelection(species.members).brain;
+                let rand2 = this.naturalSelection(species.members).brain;
                 let newBrain = rand1.crossover(rand2);
                 newBrain.applyMutations(0.8, 0.05, 0.03);
                 nextPop.push({ brain: newBrain, fitness: 0 });
@@ -96,5 +96,19 @@ class NEAT {
 
         // Remove any species with no members or just one (can't reproduce)
         this.species = this.species.filter((species) => species.members.length > 1);
+    }
+
+    naturalSelection(agentList) {
+        let totalFitness = 0;
+        for (let agent of agentList) {
+            totalFitness += agent.fitness;
+        }
+        let rand = Math.random() * totalFitness;
+        for (let agent of agentList) {
+            rand -= agent.fitness;
+            if (rand <= 0) {
+                return agent;
+            }
+        }
     }
 }

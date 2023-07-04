@@ -8,7 +8,7 @@ const GAMEHEIGHT = 200;
 let activeGames = [];
 let completedGames = [];
 
-const POPULATION = 200;
+const POPULATION = 100;
 const MUTATION_CHANCE = 1;
 
 let TIMESCALE = 1000;
