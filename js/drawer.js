@@ -32,26 +32,26 @@ class Drawer {
         let layerHeights = {};
         let nodePositions = {};
         let nodes = nn.nodes.toSorted((a, b) => a.id - b.id);
-        for(let i = 0; i < nodes.length; i++) {
+        for (let i = 0; i < nodes.length; i++) {
             let node = nodes[i];
             this.ctx.beginPath();
-            if(layerHeights[node.layer]) {
+            if (layerHeights[node.layer]) {
                 layerHeights[node.layer]++;
             } else {
                 layerHeights[node.layer] = 1;
             }
-            let x =START_OFFSET_X + COLUMN_GAP*node.layer;
+            let x = START_OFFSET_X + COLUMN_GAP * node.layer;
             let y = ROW_GAP * layerHeights[node.layer] + START_OFFSET_Y;
-            nodePositions[node.id] = {x: x, y: y};
+            nodePositions[node.id] = { x: x, y: y };
             this.ctx.arc(x, y, CIRCLE_RADIUS, 0, 2 * Math.PI);
             // this.ctx.fillStyle = Drawer.RainbowColor(nn.biasHidden.data[i][0], 1);
             this.ctx.fill();
             this.ctx.fillStyle = "black";
         }
 
-        for(let i = 0; i < nn.connections.length; i++) {
+        for (let i = 0; i < nn.connections.length; i++) {
             let conn = nn.connections[i];
-            if(Math.abs(conn.weight) < MIN_WEIGHT_DRAW)
+            if (Math.abs(conn.weight) < MIN_WEIGHT_DRAW)
                 return;
             this.ctx.beginPath();
             this.ctx.lineWidth = 1;
@@ -61,7 +61,7 @@ class Drawer {
             this.ctx.stroke();
         }
 
-        for(let i = 0; i < nn.inputLabels.length; i++) {
+        for (let i = 0; i < nn.inputLabels.length; i++) {
             this.ctx.textAlign = "right";
             this.ctx.fontSize = "30px";
             this.ctx.fillText(nn.inputLabels[i], START_OFFSET_X - 10, ROW_GAP * (i + 1) + START_OFFSET_Y);
