@@ -1,3 +1,4 @@
+const ACTIVATION_SLOPE = 5;
 class Node {
     /**
      * 
@@ -36,7 +37,7 @@ class Node {
             // Input layer has one input and no activation function
             this.outputValue = this.inputValues[0]
         } else {
-            this.outputValue = sumArr(this.inputValues) > 0.5 ? 1 : 0;
+            this.outputValue = Math.tanh(ACTIVATION_SLOPE * sumArr(this.inputValues));
         }
         for(let conn of this.outboundConnections) {
             conn.toNode.addInput(this.outputValue * conn.weight);

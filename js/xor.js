@@ -1,14 +1,14 @@
 let POPULATION = 500;
 
-let NM = new NEAT(POPULATION, 3, 1, ["x", "y", "bias"], ["output"]);
+let NM = new NEAT(POPULATION, 3, 2, ["x", "y", "bias"], ["output"]);
 
 NM.createPopulation();
 let generationNumber = 0;
 let drawers = [];
-for (let i = 0; i < 5; i++) {
+for (let i = 0; i < 2; i++) {
     let canv = document.createElement("canvas");
-    canv.setAttribute("width", 300);
-    canv.setAttribute("height", 500);
+    canv.setAttribute("width", 400);
+    canv.setAttribute("height", 100);
     canv.setAttribute("style", "border: 1px solid black");
     document.getElementById("neuralNets").appendChild(canv);
     drawers.push(new Drawer(canv.getContext("2d")));
@@ -30,16 +30,16 @@ let intr;
 let best;
 
 function getOutputs(agent) {
-    let inputs = [[0, 0], [1, 0], [0, 1], [1, 1]]
+
     let agentOut = [];
     for (let i = 0; i < inputs.length; i++) {
         let o = agent.brain.getOutput([...inputs[i], 1]);
-        agentOut.push(o[0])
+        agentOut.push(o[0] > o[1])
     }
     return agentOut;
 }
 
-
+let inputs = [[0, 0], [1, 0], [0, 1], [1, 1]];
 let desiredOutputs = [0, 1, 1, 0];
 function game() {
     best = null;
@@ -59,6 +59,7 @@ function game() {
             best = agent;
             console.log(agent.brain);
             clearInterval(intr);
+            break;
         }
         
     }
@@ -70,4 +71,4 @@ function game() {
     nextGeneration();
 }
 
-intr = setInterval(game, 100);
+intr = setInterval(game, 10);

@@ -12,6 +12,16 @@ class Connection {
         return 0.5 * (k1+k2) *(k1+k2+1) + k2
     }
 
+    setWeight(weight) {
+        if(weight > 1) {
+            weight = 1;
+        }
+        else if (weight < -1) {
+            weight = -1;
+        }
+        this.weight = weight;
+    }
+
     copy() {
         return new Connection(this.fromNode, this.toNode, this.weight);
     }
