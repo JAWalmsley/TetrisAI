@@ -34,7 +34,6 @@ class Game {
             }
             inlbl.push("Z", "S", "T", "O", "L", "I", "J");
             inlbl.push("Piece Y", "Piece X", "Piece Rotation");
-            this.neuralNet = new NeuralNetwork(this.cols + 10, this.cols + 7, 3, null, null, inlbl, ["left", "right", "rotate"]);
         }
 
         this.setupBoard();
@@ -196,11 +195,12 @@ class Game {
         ret.push(this.p.y / this.rows);
         ret.push(this.p.x / this.cols);
         ret.push(this.p.tetrominoN / 3)
+        ret.push(1); // Bias
         return ret;
     }
 
     makeAIMove() {
-        let output = this.neuralNet.getOutput(this.getInputs()).toArray();
+        let output = this.neuralNet.getOutput(this.getInputs());
         let maxOutput = 0;
         for (let i = 0; i < output.length; i++) {
             if (output[i] > output[maxOutput]) {

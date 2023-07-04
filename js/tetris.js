@@ -8,7 +8,7 @@ const GAMEHEIGHT = 200;
 let activeGames = [];
 let completedGames = [];
 
-const POPULATION = 500;
+const POPULATION = 200;
 const MUTATION_CHANCE = 1;
 
 let TIMESCALE = 1000;
@@ -46,12 +46,12 @@ for (let i = 0; i < 10; i++) {
 inlbl.push("Z", "S", "T", "O", "L", "I", "J");
 inlbl.push("Piece Y", "Piece X", "Piece Rotation");
 
-let NEATManager = new NEAT(POPULATION, MUTATION_CHANCE, 10 + 10, 3, inlbl, ["left", "right", "rotate"]);
+let NEATManager = new NEAT(POPULATION, 10 + 10 + 1, 3, inlbl, ["left", "right", "rotate"]);
 NEATManager.createPopulation();
 
 function nextGeneration() {
+    draw.drawNN(NEATManager.agents[0].brain);
     NEATManager.nextGeneration();
-    draw.drawNN(NEATManager.agents[200].brain);
     activeGames = [];
     setUp();
 }
@@ -64,7 +64,7 @@ function setUp() {
         let agent = NEATManager.agents[i];
         let div = canvasses.pop();
         let g;
-        if (activeGames.length == 0) {
+        if (i == 0) {
             div = canvasses[0];
             g = new Game(div.getElementsByTagName("canvas")[0], div.getElementsByTagName("div")[0], TIMESCALE, false, DRAW, agent.brain,
                 (fitness) => {
@@ -74,7 +74,7 @@ function setUp() {
         else {
             g = new Game(div.getElementsByTagName("canvas")[0], div.getElementsByTagName("div")[0], TIMESCALE, false, false, agent.brain,
                 (fitness) => {
-                    NEATManager.agents[i].fitness = fitness
+                    NEATManager.agents[i].fitness = fitness;
                 });
         }
 
@@ -93,14 +93,12 @@ function updateGames() {
         }
     }
     if (activeGames.length == 0) {
-        // console.log("all games finished", completedGames);
         let deltaTime = Date.now() - lastGenerationTime;
         lastGenerationTime = Date.now();
         console.log("Gen", generationNumber++,
             "Max fitness:", Math.max(...completedGames.map(g => g.fitness)),
-            "Avg fitness:", avg(completedGames.map(x => x.fitness)),
-            "Generation time:", deltaTime,
-            "Species:", NEATManager.species.length);
+            "Avg fitness:", avg(NEATManager.agents.map(x => x.fitness)),
+            "Generation time:", deltaTime);
         completedGames = [];
         console.log("restarting...")
         nextGeneration();

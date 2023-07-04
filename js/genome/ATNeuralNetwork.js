@@ -41,7 +41,8 @@ class ATNeuralNetwork {
         this.nodes.sort((a, b) => a.layer - b.layer);
     }
 
-    getOutput(inputData) {
+    getOutput(input) {
+        let inputData = input.slice();
         this.refreshNodes();
 
         // Add inputs as the only input to first layer nodes
@@ -68,7 +69,7 @@ class ATNeuralNetwork {
         }
 
         for (let conn of this.connections) {
-            let matchingConn = this.getMatchingConnection(other, conn.getInnovation());
+            let matchingConn = other.getMatchingConnection(conn.getInnovation());
             if (matchingConn == null) {
                 // Other parent doesn't have a connection between these two nodes, so just copy this connection
                 child.connections.push(conn.copy());
@@ -90,11 +91,40 @@ class ATNeuralNetwork {
         return child;
     }
 
+    geneticDistance(other) {
+        let c1 = 1, c2 = 1, c3 = 0.4;
+        let E = 0;
+        let D = 0;
+        let N = Math.max(this.connections.length, other.connections.length);
+        N = 1;
+        let weightDiffs = [];
+
+        for(let conn of this.connections) {
+            let otherconn = other.getMatchingConnection(conn.getInnovation());
+            if(!otherconn) {
+                E++;
+            } else {
+                weightDiffs.push(Math.abs(otherconn.weight - conn.weight))
+            }
+        }
+        for(let conn of other.connections) {
+            let otherconn = this.getMatchingConnection(conn.getInnovation());
+            if(!otherconn) {
+                D++;
+            } else {
+                weightDiffs.push(Math.abs(otherconn.weight - conn.weight))
+            }
+        }
+
+        let W = avg(weightDiffs);
+        return c1 * E / N + c2 * D / N + c3 * W;
+    }
+
     applyMutations(weightChance, addChance, splitChance) {
         // Mutate weights
         if (Math.random() < weightChance) {
             for (let conn of this.connections) {
-                conn.weight += gaussianRandom(0, 0.5);
+                conn.weight += gaussianRandom(0, 1);
             }
         }
 
@@ -148,8 +178,8 @@ class ATNeuralNetwork {
         }
     }
 
-    getMatchingConnection(other, innovation) {
-        for (let conn of other.connections) {
+    getMatchingConnection(innovation) {
+        for (let conn of this.connections) {
             if (conn.getInnovation() == innovation) {
                 return conn;
             }
@@ -185,5 +215,13 @@ class ATNeuralNetwork {
             }
         }
         return maximum == this.connections.length;
+    }
+
+    copy() {
+        let nn = new ATNeuralNetwork(this.numInputs, this.numOutputs, this.inputLabels, this.outputLabels)
+        nn.connections = this.connections.slice();
+        nn.nodes = this.nodes.slice();
+        nn.layers = this.layers;
+        return nn;
     }
 }
