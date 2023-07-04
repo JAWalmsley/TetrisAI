@@ -36,8 +36,19 @@ for (let i = 0; i < POPULATION + 1; i++) {
 }
 
 
+let drawers = [];
+for (let i = 0; i < 5; i++) {
+    let canv = document.createElement("canvas");
+    canv.setAttribute("width", 300);
+    canv.setAttribute("height", 500);
+    canv.setAttribute("style", "border: 1px solid black");
+    document.getElementById("neuralNets").appendChild(canv);
+    drawers.push(new Drawer(canv.getContext("2d")));
+}
+
+
 let cv = document.getElementById("neuralDisplay");
-let draw = new Drawer(cv.getContext("2d"));
+// let draw = new Drawer(cv.getContext("2d"));
 
 let inlbl = [];
 for (let i = 0; i < 10; i++) {
@@ -50,7 +61,13 @@ let NEATManager = new NEAT(POPULATION, 10 + 10 + 1, 3, inlbl, ["left", "right", 
 NEATManager.createPopulation();
 
 function nextGeneration() {
-    draw.drawNN(NEATManager.agents[0].brain);
+    for (let i = 0; i < Math.min(NEATManager.species.length, drawers.length); i++) {
+        if (NEATManager.species[i].members.length == 0) {
+            continue;
+        }
+        NEATManager.species[i].representative.inputLabels = [NEATManager.species[i].averageFitness.toString().substr(0, 5)]
+        drawers[i].drawNN(NEATManager.species[i].representative);
+    }
     NEATManager.nextGeneration();
     activeGames = [];
     setUp();

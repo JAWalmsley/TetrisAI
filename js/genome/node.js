@@ -38,6 +38,9 @@ class Node {
         } else {
             this.outputValue = Math.tanh(sumArr(this.inputValues));
         }
+        for(let conn of this.outboundConnections) {
+            conn.toNode.addInput(this.outputValue * conn.weight);
+        }
     }
 
     copy() {

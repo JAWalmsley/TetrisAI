@@ -60,5 +60,11 @@ class Drawer {
             this.ctx.lineTo(nodePositions[conn.toNode.id].x, nodePositions[conn.toNode.id].y);
             this.ctx.stroke();
         }
+
+        for(let i = 0; i < nn.inputLabels.length; i++) {
+            this.ctx.textAlign = "right";
+            this.ctx.fontSize = "30px";
+            this.ctx.fillText(nn.inputLabels[i], START_OFFSET_X - 10, ROW_GAP * (i + 1) + START_OFFSET_Y);
+        }
     }
 }

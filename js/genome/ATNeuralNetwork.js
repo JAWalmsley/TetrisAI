@@ -57,7 +57,6 @@ class ATNeuralNetwork {
                 output.push(node.outputValue);
             }
         }
-
         return output;
     }
 
@@ -96,20 +95,19 @@ class ATNeuralNetwork {
         let E = 0;
         let D = 0;
         let N = Math.max(this.connections.length, other.connections.length);
-        N = 1;
         let weightDiffs = [];
 
-        for(let conn of this.connections) {
+        for (let conn of this.connections) {
             let otherconn = other.getMatchingConnection(conn.getInnovation());
-            if(!otherconn) {
+            if (!otherconn) {
                 E++;
             } else {
                 weightDiffs.push(Math.abs(otherconn.weight - conn.weight))
             }
         }
-        for(let conn of other.connections) {
+        for (let conn of other.connections) {
             let otherconn = this.getMatchingConnection(conn.getInnovation());
-            if(!otherconn) {
+            if (!otherconn) {
                 D++;
             } else {
                 weightDiffs.push(Math.abs(otherconn.weight - conn.weight))
@@ -122,8 +120,8 @@ class ATNeuralNetwork {
 
     applyMutations(weightChance, addChance, splitChance) {
         // Mutate weights
-        if (Math.random() < weightChance) {
-            for (let conn of this.connections) {
+        for (let conn of this.connections) {
+            if (Math.random() < weightChance) {
                 conn.weight += gaussianRandom(0, 1);
             }
         }

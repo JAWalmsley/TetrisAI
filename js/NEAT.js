@@ -22,14 +22,14 @@ class NEAT {
     }
 
     nextGeneration() {
-        this.speciate(2);
+        this.speciate(3);
         console.log(this.species.length);
         let totalPopulationFitness = 0;
-        this.species.map((species) => totalPopulationFitness += species.totalFitness);
+        this.species.map((species) => totalPopulationFitness += species.averageFitness);
         this.agents = [];
         for (let species of this.species) {
             // Size of next gen is proportional to the fitness of this species (better ones get more offspring)
-            let nextGenSize = Math.floor(species.totalFitness / totalPopulationFitness * this.population);
+            let nextGenSize = Math.floor(species.averageFitness / totalPopulationFitness * this.population);
             let nextPop = [];
             species.members.sort((a, b) => b.fitness - a.fitness);
             // Elitism: Add top 20% of agents to next generation
@@ -48,7 +48,7 @@ class NEAT {
         }
 
         for(let agent of this.agents) {
-            agent.brain.applyMutations(0.8, 0.5, 0.3);
+            agent.brain.applyMutations(0.8, 0.05, 0.03);
         }
 
         // let nextPop = [];
@@ -73,19 +73,22 @@ class NEAT {
         // Clear species members
         for (let species of this.species) {
             species.members = [];
+            species.averageFitness = 0;
         }
         this.agents.forEach((agent) => {
             let foundSpecies = false;
             for (let species of this.species) {
                 if (agent.brain.geneticDistance(species.representative) < threshold) {
                     species.members.push(agent);
-                    species.totalFitness += agent.fitness;
+                    // Formula for adding averages
+                    // https://math.stackexchange.com/questions/22348/how-to-add-and-subtract-values-from-an-average
+                    species.averageFitness = species.averageFitness + (agent.fitness - species.averageFitness) / species.members.length;
                     foundSpecies = true;
                     break;
                 }
             }
             if (!foundSpecies) {
-                this.species.push({ representative: agent.brain, members: [agent], totalFitness: agent.fitness });
+                this.species.push({ representative: agent.brain, members: [agent], averageFitness: agent.fitness });
             }
         })
 
