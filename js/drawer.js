@@ -27,7 +27,7 @@ class Drawer {
         const COLUMN_GAP = 50;
         const ROW_GAP = 20;
 
-        const MIN_WEIGHT_DRAW = 0.01;
+        const MIN_WEIGHT_DRAW = 0.1;
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         let layerHeights = {};
         let nodePositions = {};
@@ -52,7 +52,7 @@ class Drawer {
         for (let i = 0; i < nn.connections.length; i++) {
             let conn = nn.connections[i];
             if (Math.abs(conn.weight) < MIN_WEIGHT_DRAW)
-                return;
+                continue;
             this.ctx.beginPath();
             this.ctx.lineWidth = 1;
             this.ctx.strokeStyle = Drawer.RainbowColor(conn.weight, 1);
@@ -60,7 +60,7 @@ class Drawer {
             this.ctx.lineTo(nodePositions[conn.toNode.id].x, nodePositions[conn.toNode.id].y);
             this.ctx.stroke();
         }
-
+        
         for (let i = 0; i < nn.inputLabels.length; i++) {
             this.ctx.textAlign = "right";
             this.ctx.fontSize = "30px";

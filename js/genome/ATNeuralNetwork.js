@@ -95,6 +95,7 @@ class ATNeuralNetwork {
         let E = 0;
         let D = 0;
         let N = Math.max(this.connections.length, other.connections.length);
+        N = 1;
         let weightDiffs = [];
 
         for (let conn of this.connections) {
@@ -115,14 +116,15 @@ class ATNeuralNetwork {
         }
 
         let W = avg(weightDiffs);
-        return c1 * E / N + c2 * D / N + c3 * W;
+        let dist = c1 * E / N + c2 * D / N + c3 * W;
+        return dist;
     }
 
     applyMutations(weightChance, addChance, splitChance) {
         // Mutate weights
         for (let conn of this.connections) {
             if (Math.random() < weightChance) {
-                conn.weight += gaussianRandom(0, 1);
+                conn.weight += gaussianRandom(0, 0.5);
             }
         }
 

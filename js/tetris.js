@@ -65,8 +65,8 @@ function nextGeneration() {
         if (NEATManager.species[i].members.length == 0) {
             continue;
         }
-        NEATManager.species[i].representative.inputLabels = [NEATManager.species[i].averageFitness.toString().substr(0, 5)]
-        drawers[i].drawNN(NEATManager.species[i].representative);
+        // NEATManager.species[i].representative.inputLabels = [NEATManager.species[i].averageFitness.toString().substr(0, 5)]
+        drawers[i].drawNN(NEATManager.species[i].members[0].brain);
     }
     NEATManager.nextGeneration();
     activeGames = [];

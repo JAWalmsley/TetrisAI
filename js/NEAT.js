@@ -33,23 +33,25 @@ class NEAT {
             let nextPop = [];
             species.members.sort((a, b) => b.fitness - a.fitness);
             // Elitism: Add top 20% of agents to next generation
-            // for (let i = 0; i < nextGenSize * 0.2; i++) {
-            //     nextPop.push({ brain: species.members[i].brain.copy(), fitness: 0 });
-            // }
+            for (let i = 0; i < Math.min(Math.floor(nextGenSize * 0.2), species.members.length); i++) {
+                nextPop.push({ brain: species.members[i].brain.copy(), fitness: 0 });
+            }
             // Crossover to reproduct and fill the next generation
-            for (let i = 0; i < nextGenSize; i++) {
+            for (let i = 0; i < Math.floor(nextGenSize * 0.8); i++) {
                 let rand1 = species.members[Math.floor(Math.random() * species.members.length)].brain;
                 let rand2 = species.members[Math.floor(Math.random() * species.members.length)].brain;
-                nextPop.push({ brain: rand1.crossover(rand2), fitness: 0 });
+                let newBrain = rand1.crossover(rand2);
+                newBrain.applyMutations(0.8, 0.05, 0.03);
+                nextPop.push({ brain: newBrain, fitness: 0 });
             }
-            species.representative = species.members[Math.floor(Math.random() * species.members.length)].brain;
+            // species.representative = species.members[Math.floor(Math.random() * species.members.length)].brain;
             this.agents.push(...nextPop);
             species.members = nextPop;
         }
 
-        for(let agent of this.agents) {
-            agent.brain.applyMutations(0.8, 0.05, 0.03);
-        }
+        // for(let agent of this.agents) {
+        //     agent.brain.applyMutations(0.8, 0.05, 0.03);
+        // }
 
         // let nextPop = [];
         // this.agents.sort((a, b) => b.fitness - a.fitness);

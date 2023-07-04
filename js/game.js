@@ -201,13 +201,16 @@ class Game {
 
     makeAIMove() {
         let output = this.neuralNet.getOutput(this.getInputs());
-        let maxOutput = 0;
+        let maxOutputIndex = -1;
+        let maxOutput = -10;
+        let changed = false;
         for (let i = 0; i < output.length; i++) {
-            if (output[i] > output[maxOutput]) {
-                maxOutput = i;
+            if (output[i] > maxOutput) {
+                maxOutput = output[i];
+                maxOutputIndex = i;
             }
         }
-        switch(maxOutput) {
+        switch(maxOutputIndex) {
             case 0:
                 this.handleKeyEvent({ keyCode: LEFTARROW });
                 break;
