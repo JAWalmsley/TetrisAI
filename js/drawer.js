@@ -22,75 +22,98 @@ class Drawer {
 
     drawNN(nn) {
         const START_OFFSET_X = 100;
-        const START_OFFSET_Y = 50;
-        const CIRCLE_RADIUS = 5;
-        const COLUMN_GAP = 100;
+        const START_OFFSET_Y = 10;
+        const COLUMN_GAP = 50;
         const ROW_GAP = 20;
 
-        const MIN_WEIGHT_DRAW = 0.9;
+        const MIN_WEIGHT_DRAW = 0;
         this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-        let inputs = nn.weightsIH.cols;
-        let hiddens = nn.weightsIH.rows;
-        let outputs = nn.weightsHO.rows;
-
-        let inLabels = nn.inputLabels;
-        let outLabels = nn.outputLabels;
-        for (let i = 0; i < inputs; i++) {
-            this.ctx.beginPath();
-            this.ctx.arc(START_OFFSET_X, ROW_GAP * i + START_OFFSET_Y, CIRCLE_RADIUS, 0, 2 * Math.PI);
-            this.ctx.stroke();
-            if(inLabels)
-            {
-                this.ctx.textAlign = "right";
-                this.ctx.fillText(inLabels[i], START_OFFSET_X - 10, ROW_GAP * i + START_OFFSET_Y);
+        let layerHeights = {};
+        let nodePositions = {};
+        let nodes = nn.nodes.toSorted((a, b) => a.id - b.id);
+        for (let i = 0; i < nodes.length; i++) {
+            let size = 5;
+            let node = nodes[i];
+            if(node.isOutput) {
+                size = 10;
             }
-   
-        }
-
-        for (let i = 0; i < hiddens; i++) {
             this.ctx.beginPath();
-            this.ctx.arc(START_OFFSET_X + COLUMN_GAP, ROW_GAP * i + START_OFFSET_Y, CIRCLE_RADIUS, 0, 2 * Math.PI);
-            this.ctx.fillStyle = Drawer.RainbowColor(nn.biasHidden.data[i][0], 1);
+            if (layerHeights[node.layer]) {
+                layerHeights[node.layer]++;
+            } else {
+                layerHeights[node.layer] = 1;
+            }
+            let xoff = node.layer*0.5;
+            // if (node.layer > 0 && !node.isOutput) {
+            //     xoff = 1;
+            //     layerHeights[node.layer]-=1;
+            // }
+            // if (node.isOutput) {
+            //     xoff = 2;
+            // }
+            let x = START_OFFSET_X + COLUMN_GAP * xoff;
+            let y = ROW_GAP * layerHeights[node.layer] + START_OFFSET_Y;
+            nodePositions[node.id] = { x: x, y: y };
+            this.ctx.arc(x, y, size, 0, 2 * Math.PI);
+            this.ctx.fillStyle = Drawer.RainbowColor(node.outputValue, 1);
             this.ctx.fill();
             this.ctx.fillStyle = "black";
         }
 
-        for (let i = 0; i < outputs; i++) {
+        for (let i = 0; i < nn.connections.length; i++) {
+            let conn = nn.connections[i];
+            if (Math.abs(conn.weight) < MIN_WEIGHT_DRAW)
+                continue;
             this.ctx.beginPath();
-            this.ctx.arc(START_OFFSET_X + COLUMN_GAP * 2, ROW_GAP * i + START_OFFSET_Y, CIRCLE_RADIUS, 0, 2 * Math.PI);
-            this.ctx.fillStyle = Drawer.RainbowColor(nn.biasOutput.data[i][0], 1);
-            this.ctx.fill();
-            this.ctx.fillStyle = "black";
-            if(outLabels)
-            {
-                this.ctx.textAlign = "left";
-                this.ctx.fillText(outLabels[i], START_OFFSET_X + COLUMN_GAP * 2 + 10, ROW_GAP * i + START_OFFSET_Y);
-            }
-
+            this.ctx.lineWidth = 1;
+            this.ctx.strokeStyle = Drawer.RainbowColor(conn.weight, 1);
+            this.ctx.moveTo(nodePositions[conn.fromNode.id].x, nodePositions[conn.fromNode.id].y);
+            this.ctx.lineTo(nodePositions[conn.toNode.id].x, nodePositions[conn.toNode.id].y);
+            this.ctx.stroke();
         }
 
-        nn.weightsIH.foreach((x, r, c) => {
-            if (Math.abs(x) < MIN_WEIGHT_DRAW) { return; }
-            this.ctx.beginPath();
-            this.ctx.moveTo(START_OFFSET_X, ROW_GAP * c + START_OFFSET_Y);
-            this.ctx.lineTo(START_OFFSET_X + COLUMN_GAP, ROW_GAP * r + START_OFFSET_Y);
-            // this.ctx.lineWidth = Math.abs(x);
-            this.ctx.strokeStyle = Drawer.RainbowColor(x, 1);
-            this.ctx.stroke();
-            this.ctx.lineWidth = 1;
-            this.ctx.strokeStyle = "black";
-        })
+        for (let i = 0; i < nn.inputLabels.length; i++) {
+            this.ctx.textAlign = "right";
+            this.ctx.fontSize = "30px";
+            this.ctx.fillText(nn.inputLabels[i], START_OFFSET_X - 10, ROW_GAP * (i + 1) + START_OFFSET_Y);
+        }
+    }
 
-        nn.weightsHO.foreach((x, r, c) => {
-            if (Math.abs(x) < MIN_WEIGHT_DRAW) { return; }
+    drawGrid(data, dim, smallData, smallDim) {
+        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        let row = 0;
+        let col = 0;
+       
+        
+        let sizeDiff = (dim-1)/(smallDim-1)
+        for (let item of smallData) {
             this.ctx.beginPath();
-            this.ctx.moveTo(START_OFFSET_X + COLUMN_GAP, ROW_GAP * c + START_OFFSET_Y);
-            this.ctx.lineTo(START_OFFSET_X + COLUMN_GAP * 2, ROW_GAP * r + START_OFFSET_Y);
-            // this.ctx.lineWidth = Math.abs(x);
-            this.ctx.strokeStyle = Drawer.RainbowColor(x, 1);
-            this.ctx.stroke();
-            this.ctx.lineWidth = 1;
-            this.ctx.strokeStyle = "black";
-        })
+            this.ctx.arc(20 + row * (40*sizeDiff), 20 + col * (40*sizeDiff), 2, 0, 2 * Math.PI);
+            this.ctx.fillStyle = Drawer.RainbowColor(item?1:0, 1);
+            this.ctx.fill();
+            if (row == smallDim - 1) {
+                row = 0;
+                col++;
+            }
+            else {
+                row++;
+            }
+        }
+        row = 0;
+        col = 0;
+        for (let item of data) {
+            this.ctx.beginPath();
+            this.ctx.arc(20 + row * 40, 20 + col * 40, 5, 0, 2 * Math.PI);
+            this.ctx.fillStyle = Drawer.RainbowColor(item, 1);
+            this.ctx.fill();
+            if (row == dim - 1) {
+                row = 0;
+                col++;
+            }
+            else {
+                row++;
+
+            }
+        }
     }
 }

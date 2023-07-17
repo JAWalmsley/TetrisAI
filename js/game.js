@@ -7,7 +7,7 @@ const SPACEBAR = 32;
 const ROWCOMPLETEBONUS = 200;
 
 class Game {
-    constructor(canvas, scoreElement, timescale, keyboardControlled, draw, neuralNet) {
+    constructor(canvas, scoreElement, timescale, keyboardControlled, draw, neuralNet, gameOverCallback=null) {
         this.fitness = 0;
         this.canvas = canvas;
         if (draw) {
@@ -21,6 +21,7 @@ class Game {
         this.gameOver = false;
         this.blocksPlaced = 0;
         this.lastDrop = Date.now();
+        this.gameOverCallback = gameOverCallback;
 
         if (keyboardControlled) {
             document.addEventListener("keydown", this.handleKeyEvent.bind(this));
@@ -33,7 +34,6 @@ class Game {
             }
             inlbl.push("Z", "S", "T", "O", "L", "I", "J");
             inlbl.push("Piece Y", "Piece X", "Piece Rotation");
-            this.neuralNet = new NeuralNetwork(this.cols + 10, this.cols + 7, 3, null, inlbl, ["left", "right", "rotate"]);
         }
 
         this.setupBoard();
@@ -79,6 +79,16 @@ class Game {
         return m;
     }
 
+    boardToArray() {
+        let output = [];
+        for(let row of this.board) {
+            for(let cell of row) {
+                output.push(cell === VACANT ? 0 : 1);
+            }
+        }
+        return output;
+    }
+
     handleKeyEvent(event) {
         if (event.keyCode == LEFTARROW) {
             this.p.moveLeft();
@@ -101,6 +111,7 @@ class Game {
         for (let c = 0; c < this.cols; c++) {
             if (this.board[0][c] !== VACANT) {
                 this.gameOver = true;
+                this.gameOverCallback(this.getFitness());
                 return;
             }
         }
@@ -159,6 +170,7 @@ class Game {
             // Normalized to [0, 1] because neural networks like that kinda stuff
             ret.push(height / this.rows);
         }
+        // ret.push(...this.boardToArray());
 
         // Type of piece up next as input
         // We give each possible tetromino its own input neuron because that is more optimal
@@ -194,18 +206,21 @@ class Game {
         ret.push(this.p.y / this.rows);
         ret.push(this.p.x / this.cols);
         ret.push(this.p.tetrominoN / 3)
+        ret.push(1); // Bias
         return ret;
     }
 
     makeAIMove() {
-        let output = this.neuralNet.getOutput(this.getInputs()).toArray();
-        let maxOutput = 0;
+        let output = this.neuralNet.getOutput(this.getInputs());
+        let maxOutputIndex = -1;
+        let maxOutput = -10;
         for (let i = 0; i < output.length; i++) {
-            if (output[i] > output[maxOutput]) {
-                maxOutput = i;
+            if (output[i] > maxOutput) {
+                maxOutput = output[i];
+                maxOutputIndex = i;
             }
         }
-        switch(maxOutput) {
+        switch(maxOutputIndex) {
             case 0:
                 this.handleKeyEvent({ keyCode: LEFTARROW });
                 break;
@@ -214,6 +229,9 @@ class Game {
                 break;
             case 2:
                 this.handleKeyEvent({keyCode: UPARROW});
+                break;
+            case 3:
+                // Do nothing
                 break;
         }
         // let maxRotation = 0;
@@ -254,7 +272,7 @@ class Game {
     update() {
         this.drawBoard();
         if (this.gameOver) {
-            if (this.drawer) {
+            if (this.scoreElement) {
                 this.scoreElement.innerText = "Game over, score: " + this.score.toString();
             }
             return;
@@ -270,7 +288,7 @@ class Game {
         }
         this.checkGameOver();
         this.fitness = this.getFitness();
-        if (this.drawer) {
+        if (this.scoreElement) {
             this.scoreElement.innerHTML = this.fitness.toString();
         }
     }

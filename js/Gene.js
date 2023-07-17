@@ -7,6 +7,22 @@ class Gene {
         this.innovation = innovation;
     }
 
+    in() {
+        return parseInt(this.input.substring(1));
+    }
+
+    layerIn() {
+        return this.input.substring(0, 1);
+    }
+
+    out() {
+        return parseInt(this.output.substring(1));
+    }
+
+    layerOut() {
+        return this.output.substring(0, 1);
+    }
+
     static getInnovationNumber(gene) {
         
     }

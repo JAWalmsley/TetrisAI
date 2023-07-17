@@ -27,7 +27,7 @@ class Matrix {
      */
     add(b) {
         if (this.rows !== b.rows || this.cols !== b.cols) {
-            console.error("Addition: Matrix dimensions don't match");
+            console.error("Addition: Matrix dimensions don't match", this.rows, this.cols, b.rows, b.cols);
             return undefined;
         }
         this.map((v, i, j) => this.data[i][j] + b.data[i][j]);
@@ -40,14 +40,14 @@ class Matrix {
      * @returns {Matrix}
      */
     static multiply(a, b) {
-        if(a.cols !== b.rows) {
+        if (a.cols !== b.rows) {
             console.error("Multiplication: Matrix dimensions don't match", a.cols, b.rows);
             return undefined;
         }
         let output = new Matrix(a.rows, b.cols);
         output.map((v, i, j) => {
             let sum = 0;
-            for(let c = 0; c < a.cols; c++) {
+            for (let c = 0; c < a.cols; c++) {
                 sum += a.data[i][c] * b.data[c][j];
             }
             return sum;
@@ -57,8 +57,8 @@ class Matrix {
 
     toArray() {
         let arr = [];
-        for(let i = 0; i < this.rows; i++) {
-            for(let j = 0; j < this.cols; j++) {
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
                 arr.push(this.data[i][j]);
             }
         }
@@ -121,15 +121,39 @@ class Matrix {
      * @param {Number} min 
      * @param {Number} max 
      */
-    randomize(min=-1, max=1) {
-        let mean = (min+max)/2
-        let stddev = (max-mean)
+    randomize(min = -1, max = 1) {
+        let mean = (min + max) / 2
+        let stddev = (max - mean)
         return this.map(() => gaussianRandom(mean, stddev));
+    }
+
+    /**
+     * Expand array to new given size
+     * @param {Number} rows 
+     * @param {Number} cols 
+     */
+    resize(rows, cols) {
+        rows = Math.max(rows, this.rows);
+        cols = Math.max(cols, this.cols);
+        for (let i = 0; i < rows; i++) {
+            if (this.data[i] && this.data[i].length < cols) {
+                this.data[i].push(...Array(cols - this.data[i].length).fill(0));
+            }
+            else if (!this.data[i]){
+                this.data.push(Array(cols).fill(0));
+            }
+        }
+        this.rows = rows;
+        this.cols = cols;
+    }
+
+    expand(rows, cols) {
+        this.resize(this.rows + rows, this.cols + cols);
     }
 
     toString() {
         let ret = "";
-        for(let i = 0; i < this.rows; i++) {
+        for (let i = 0; i < this.rows; i++) {
             ret += this.data[i].join(" ") + "\n";
         }
         return ret;
