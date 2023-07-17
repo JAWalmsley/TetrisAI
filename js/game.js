@@ -7,7 +7,7 @@ const SPACEBAR = 32;
 const ROWCOMPLETEBONUS = 200;
 
 class Game {
-    constructor(canvas, scoreElement, timescale, keyboardControlled, draw, neuralNet, gameOverCallback=null) {
+    constructor(canvas, scoreElement, timescale, keyboardControlled, draw, neuralNet, pieceOrder, gameOverCallback=null) {
         this.fitness = 0;
         this.canvas = canvas;
         if (draw) {
@@ -22,6 +22,7 @@ class Game {
         this.blocksPlaced = 0;
         this.lastDrop = Date.now();
         this.gameOverCallback = gameOverCallback;
+        this.pieceOrder = pieceOrder;
 
         if (keyboardControlled) {
             document.addEventListener("keydown", this.handleKeyEvent.bind(this));
@@ -39,7 +40,9 @@ class Game {
         this.setupBoard();
         this.drawBoard();
         this.timescale = timescale;
-        this.p = Piece.random(this.board, this.drawer);
+
+        nextPiece = this.pieceOrder.pop()
+        this.p = new Piece(this.board, this.drawer, nextPiece[0], nextPiece[1]);
     }
 
     setupBoard() {
@@ -153,7 +156,9 @@ class Game {
         this.blocksPlaced++;
         this.checkCompleteRow();
         this.drawBoard();
-        this.p = Piece.random(this.board, this.drawer);
+        // Get next piece in the order for tournament
+        nextPiece = this.pieceOrder.pop()
+        this.p = new Piece(this.board, this.drawer, nextPiece[0], nextPiece[1]);
     }
 
     getInputs() {
