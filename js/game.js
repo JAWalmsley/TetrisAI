@@ -85,8 +85,8 @@ class Game {
     boardToArray() {
         let output = [];
         for(let row of this.board) {
-            for(let cell of row) {
-                output.push(cell === VACANT ? 0 : 1);
+            for(let col of row) {
+                output.push(col === VACANT ? 0 : 1);
             }
         }
         return output;
@@ -211,6 +211,7 @@ class Game {
         ret.push(this.p.y / this.rows);
         ret.push(this.p.x / this.cols);
         ret.push(this.p.tetrominoN / 3)
+        ret.push(...this.boardToArray())
         ret.push(1); // Bias
         return ret;
     }
@@ -296,5 +297,6 @@ class Game {
         if (this.scoreElement) {
             this.scoreElement.innerHTML = this.fitness.toString();
         }
+        
     }
 }

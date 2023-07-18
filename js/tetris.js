@@ -8,7 +8,7 @@ const GAMEHEIGHT = 200;
 let activeGames = [];
 let completedGames = [];
 
-const POPULATION = 500;
+const POPULATION = 100;
 const MUTATION_CHANCE = 1;
 
 let TIMESCALE = 1000;
@@ -57,7 +57,7 @@ for (let i = 0; i < 10; i++) {
 inlbl.push("Z", "S", "T", "O", "L", "I", "J");
 inlbl.push("Piece Y", "Piece X", "Piece Rotation");
 
-let NEATManager = new NEAT(POPULATION, 10 + 10 + 1, 4, inlbl, ["left", "right", "rotate"]);
+let NEATManager = new NEAT(POPULATION, 10 + 10 + 1 + 200, 4, inlbl, ["left", "right", "rotate"]);
 NEATManager.createPopulation();
 
 function nextGeneration() {
@@ -72,11 +72,11 @@ function nextGeneration() {
     activeGames = [];
     setUp();
 }
-let order = randomPieceOrder();
+
 function setUp() {
     // Wild DOM hack to turn a HTMLCollection into an array
     let canvasses = Array.prototype.slice.call(canvList);
-    
+    let order = randomPieceOrder();
 
     for (let i = 0; i < NEATManager.agents.length; i++) {
         let agent = NEATManager.agents[i];
@@ -127,7 +127,6 @@ function updateGames() {
         console.log("restarting...")
         nextGeneration();
     }
-    // requestAnimationFrame(updateGames);
 }
 
 setUp();
