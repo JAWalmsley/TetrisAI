@@ -1,4 +1,4 @@
-const ACTIVATION_SLOPE = 5;
+const ACTIVATION_SLOPE = 3;
 class Node {
     /**
      * 

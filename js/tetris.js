@@ -8,7 +8,7 @@ const GAMEHEIGHT = 200;
 let activeGames = [];
 let completedGames = [];
 
-const POPULATION = 100;
+const POPULATION = 500;
 const MUTATION_CHANCE = 1;
 
 let TIMESCALE = 1000;
@@ -72,10 +72,11 @@ function nextGeneration() {
     activeGames = [];
     setUp();
 }
-
+let order = randomPieceOrder();
 function setUp() {
     // Wild DOM hack to turn a HTMLCollection into an array
     let canvasses = Array.prototype.slice.call(canvList);
+    
 
     for (let i = 0; i < NEATManager.agents.length; i++) {
         let agent = NEATManager.agents[i];
@@ -83,13 +84,13 @@ function setUp() {
         let g;
         if (i == 0) {
             div = canvasses[0];
-            g = new Game(div.getElementsByTagName("canvas")[0], div.getElementsByTagName("div")[0], TIMESCALE, false, DRAW, agent.brain,
+            g = new Game(div.getElementsByTagName("canvas")[0], div.getElementsByTagName("div")[0], TIMESCALE, false, DRAW, agent.brain, order.slice(),
                 (fitness) => {
                     NEATManager.agents[i].fitness = fitness
                 });
         }
         else {
-            g = new Game(div.getElementsByTagName("canvas")[0], div.getElementsByTagName("div")[0], TIMESCALE, false, false, agent.brain,
+            g = new Game(div.getElementsByTagName("canvas")[0], div.getElementsByTagName("div")[0], TIMESCALE, false, false, agent.brain, order.slice(),
                 (fitness) => {
                     NEATManager.agents[i].fitness = fitness;
                 });
@@ -99,11 +100,13 @@ function setUp() {
     }
 }
 
-function tournament() {
-    
+function randomPieceOrder() {
+    let output = [];
+    for(let i = 0; i < 300; i++) {
+        output.push(PIECES[Math.floor(Math.random() * PIECES.length)]);
+    }
+    return output;
 }
-
-
 
 function updateGames() {
     for (let game of activeGames) {

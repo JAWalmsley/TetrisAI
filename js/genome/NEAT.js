@@ -1,4 +1,4 @@
-const ELITISM = 0.5;
+const ELITISM = 0.2;
 const WEIGHT = 0.8;
 const NEWCONN = 0.05;
 const NEWNODE = 0.03;
@@ -27,7 +27,7 @@ class NEAT {
     }
 
     nextGeneration() {
-        this.speciate(3);
+        this.speciate(0.13);
         console.log(this.species.length);
         let totalPopulationFitness = 0;
         this.species.map((species) => totalPopulationFitness += species.averageFitness);
@@ -39,8 +39,8 @@ class NEAT {
             species.members.sort((a, b) => b.fitness - a.fitness);
             // Elitism: Add top 20% of agents to next generation
             for (let i = 0; i < Math.min(Math.floor(nextGenSize * ELITISM), species.members.length); i++) {
-                let newBrain = species.members[0].brain.copy();
-                newBrain.applyMutations(WEIGHT, NEWCONN, NEWNODE);
+                let newBrain = species.members[i].brain.copy();
+                // newBrain.applyMutations(WEIGHT, NEWCONN, NEWNODE);
                 nextPop.push({ brain: newBrain, fitness: 0 });
             }
             // Crossover to reproduct and fill the next generation
@@ -48,7 +48,7 @@ class NEAT {
                 let rand1 = this.naturalSelection(species.members).brain;
                 let rand2 = this.naturalSelection(species.members).brain;
                 let newBrain = rand1.crossover(rand2);
-                // newBrain.applyMutations(WEIGHT, NEWCONN, NEWNODE);
+                newBrain.applyMutations(WEIGHT, NEWCONN, NEWNODE);
                 nextPop.push({ brain: newBrain, fitness: 0 });
             }
             // species.representative = species.members[Math.floor(Math.random() * species.members.length)].brain;

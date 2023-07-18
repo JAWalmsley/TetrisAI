@@ -96,7 +96,7 @@ class ATNeuralNetwork {
         let E = 0;
         let D = 0;
         let N = Math.max(this.connections.length, other.connections.length);
-        N = 1;
+        // N = 1;
         let weightDiffs = [];
 
         for (let conn of this.connections) {
@@ -124,8 +124,8 @@ class ATNeuralNetwork {
         // Mutate weights
         for (let conn of this.connections) {
             let rand = Math.random();
-            // 5% chance of completely new weight
-            if (rand < 0.05) {
+            // 1% chance of completely new weight
+            if (rand < 0.01) {
                 conn.setWeight(Math.random() * 2 - 1);
             }
             else if (rand < weightChance) {

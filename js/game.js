@@ -41,7 +41,7 @@ class Game {
         this.drawBoard();
         this.timescale = timescale;
 
-        nextPiece = this.pieceOrder.pop()
+        let nextPiece = this.pieceOrder.pop()
         this.p = new Piece(this.board, this.drawer, nextPiece[0], nextPiece[1]);
     }
 
@@ -157,7 +157,7 @@ class Game {
         this.checkCompleteRow();
         this.drawBoard();
         // Get next piece in the order for tournament
-        nextPiece = this.pieceOrder.pop()
+        let nextPiece = this.pieceOrder.pop()
         this.p = new Piece(this.board, this.drawer, nextPiece[0], nextPiece[1]);
     }
 
