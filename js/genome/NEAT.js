@@ -27,7 +27,7 @@ class NEAT {
     }
 
     nextGeneration() {
-        this.speciate(0.13);
+        this.speciate(0.1);
         console.log(this.species.length);
         let totalPopulationFitness = 0;
         this.species.map((species) => totalPopulationFitness += species.averageFitness);

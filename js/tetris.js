@@ -27,7 +27,10 @@ for (let i = 0; i < POPULATION + 1; i++) {
     let canv = document.createElement("canvas");
     canv.setAttribute("width", GAMEWIDTH.toString());
     canv.setAttribute("height", GAMEHEIGHT.toString());
-    canv.setAttribute("style", "border: 1px solid black");
+    canv.setAttribute("style", "border: 1px solid black;");
+    if(i != 0 ) {
+        canv.setAttribute("style", "display:none")
+    }
     let scoreCounter = document.createElement("div")
     d.appendChild(canv);
     d.appendChild(scoreCounter);
@@ -73,10 +76,11 @@ function nextGeneration() {
     setUp();
 }
 
+let order = randomPieceOrder();
 function setUp() {
     // Wild DOM hack to turn a HTMLCollection into an array
     let canvasses = Array.prototype.slice.call(canvList);
-    let order = randomPieceOrder();
+
 
     for (let i = 0; i < NEATManager.agents.length; i++) {
         let agent = NEATManager.agents[i];

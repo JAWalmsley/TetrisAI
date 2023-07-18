@@ -16,8 +16,8 @@ class Game {
         }
         this.score = 0;
         this.board = [];
-        this.rows = canvas.clientHeight / SQ;
-        this.cols = canvas.clientWidth / SQ;
+        this.rows = 20;
+        this.cols = 10;
         this.gameOver = false;
         this.blocksPlaced = 0;
         this.lastDrop = Date.now();
